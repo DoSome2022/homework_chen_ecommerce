@@ -1,0 +1,289 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  Fname        String?
+  Lname        String?
+  name         String?
+  email        String?  @unique
+  phone        String?
+  passwordHash String
+  role         UserRole
+  currentMembershipLevel MembershipLevel @default(FREE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+memberships UserMembership[]
+  Order           Order[]
+  Cart            Cart[]
+ wishlist        Product[] @relation("UserWishlist")  // 新增：用戶的願望清單商品
+  settledAccounts AccountEntry[] @relation("AccountsSettledByUser")
+  renewalRequests RenewalRequest[]
+}
+
+
+
+model Category {
+  id       String    @id @default(uuid())
+  category String    @unique
+  products Product[] @relation("ProductCategory")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id         String    @id @default(uuid())
+  title      String?
+  des        String?
+  unit       String[]
+  price      String?
+  img        String?
+  categoryId String?
+  category   Category? @relation("ProductCategory", fields: [categoryId], references: [id])
+
+  // ← 新增這兩行
+  materialIds String[] // 儲存多個 material id
+  materials   Materials[] @relation("ProductMaterial")
+
+  arrivalDate DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cartitems  CartItem[]
+  orderitems OrderItem[]
+  wishlistedBy User[] @relation("UserWishlist")  // 新增：被哪些用戶加入願望清單
+}
+
+model Unit {
+  id   String @id @default(uuid())
+  unit String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Materials {
+  id        String    @id @default(uuid())
+  materials String
+  products  Product[] @relation("ProductMaterial")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 購物車（一人只有一筆）
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id])
+  items     CartItem[]
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String  @id @default(uuid())
+  cartId    String
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  unit      String
+  quantity  Int     @default(1)
+
+  createdAt DateTime @default(now()) // ← 加這行
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId, unit]) // 同一商品同一尺寸只能一筆
+}
+
+// 訂單
+model Order {
+  id                    String        @id @default(uuid())
+  userId                String
+  user                  User          @relation(fields: [userId], references: [id])
+  orderNumber           String        @unique @default(cuid()) // 簡單用 cuid 即可
+  status                String        @default("pending") // pending → paid → shipped → completed
+  total                 Int // 同樣用「分」儲存
+  items                 OrderItem[]
+  receipt               Receipt? // 一對一
+  invoice               Invoice? // 一對一
+  PickupNumber          String        @unique @default(cuid())
+  shippingNumber        String        @unique @default(cuid())
+  shippingMethod        String? // 新增：物流方式
+  preferredDeliveryTime String? // 新增：期望送達時間
+  shippingFee           Int           @default(0) // 新增：運費
+  shippingName          String
+  shippingPhone         String
+  shippingAddress       String
+  trackingNumber        String? // ← 新增：物流單號
+
+// 新增：轉帳證明圖片 URL
+  transferProofImg      String?
+  // 新增：訂單備註（使用者填寫 + 系統記錄優惠）
+  notes                 String?
+
+  accountEntry          AccountEntry?
+
+  createdAt DateTime  @default(now())
+  paidAt    DateTime?
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  title     String
+  image     String?
+  size      String
+  price     Int
+  quantity  Int
+
+  // 新增：是否已備貨（管理員勾選）
+  isPicked  Boolean @default(false)
+
+  @@unique([orderId, productId, size]) // 若原本無此唯一約束可加
+}
+
+model Receipt {
+  id        String   @id @default(uuid())
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+// 發票（極簡，僅支援電子發票）
+model Invoice {
+  id            String   @id @default(uuid())
+  orderId       String   @unique
+  order         Order    @relation(fields: [orderId], references: [id])
+  invoiceNumber String   @unique @default(cuid()) // 可自行換成真發票號碼
+  buyerName     String?
+  buyerUBN      String? // 統編
+  createdAt     DateTime @default(now())
+}
+
+model AccountEntry {
+  id      String @id @default(uuid())
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  settledById String
+  settledBy   User   @relation("AccountsSettledByUser", fields: [settledById], references: [id])
+
+  settledAt DateTime @default(now())
+
+  totalAmount   Int
+  shippingFee   Int
+  productAmount Int
+
+  createdAt DateTime @default(now())
+
+  @@index([settledAt])
+}
+
+model Discount {
+  id          String   @id @default(uuid())
+  code        String?  @unique // 若為 coupon 可填，否則 null
+  name        String   // 顯示名稱，例如「會員專屬9折」
+  type        DiscountType
+  value       Int      // 折扣值：若為百分比則存 10 表示 10%，若為固定金額則存實際金額
+  isPercent   Boolean  @default(true) // true = 百分比折扣，false = 固定金額折扣
+  minAmount   Int?     // 最低消費金額（可選）
+  startAt     DateTime
+  endAt       DateTime?
+
+  // 適用條件
+  memberOnly  Boolean  @default(false) // 僅限會員
+  pickupOnly  Boolean  @default(false) // 僅限門市自取
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum DiscountType {
+  MEMBER     // 會員專屬
+  PICKUP     // 門市自取折扣
+  TIMELIMIT  // 限時促銷
+  // 可擴展：COUPON, FULL_REDUCTION 等
+}
+
+// 可選：移除 MembershipTier 模型（如果不再需要）
+// 如果其他功能需要會員等級詳細資訊，可保留但移除關聯
+model MembershipTier {
+  id          String   @id @default(uuid())
+  level       MembershipLevel @unique
+  name        String
+  price       Int
+  benefits    String[]
+  color       String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 移除 memberships 關聯
+}
+model UserMembership {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  tierLevel     MembershipLevel  // 直接用 enum，不再關聯到 MembershipTier
+  startsAt      DateTime
+  endsAt        DateTime?
+  autoRenew     Boolean   @default(true)
+  status        String    @default("active")
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // 移除 tierId 和 tier 關聯
+  @@unique([userId])
+}
+model RenewalRequest {
+  id        String          @id @default(uuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id])
+  tierLevel MembershipLevel // ← 改成直接存 enum 值，不再用 tierId
+  status    RenewalStatus   @default(PENDING)
+  requestedAt DateTime      @default(now())
+  processedAt DateTime?
+  notes     String?
+
+  @@index([status])
+}
+
+enum RenewalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MembershipLevel {
+  FREE      // 免費會員（預設）
+  SILVER    // 銀級
+  GOLD      // 金級
+  PLATINUM  // 白金級
+}
+
+
+enum UserRole {
+  ADMIN
+  USER
+}
