@@ -126,6 +126,9 @@ model Order {
   PickupNumber          String        @unique @default(cuid())
   shippingNumber        String        @unique @default(cuid())
   shippingMethod        String? // 新增：物流方式
+  paymentMethod     String?  // "stripe" | "bank_transfer" | "cash_on_delivery" 等
+  paymentIntentId   String?  @unique  // Stripe PaymentIntent ID
+  paymentStatus     String?  @default("pending")  // pending, succeeded, failed, refunded 等
   preferredDeliveryTime String? // 新增：期望送達時間
   shippingFee           Int           @default(0) // 新增：運費
   shippingName          String

@@ -1,20 +1,21 @@
-import { redirect } from "next/navigation";
-import { auth } from "../../../../../../auth";
-import CheckoutForm from "@/app/checkout/CheckoutForm";
+// src/app/(user)/user/[id]/checkout/page.tsx
+import { redirect } from 'next/navigation';
+
+import CheckoutForm from '@/app/checkout/CheckoutForm';
+import StripeProvider from './component/StripeProvider';
+import { auth } from '../../../../../../auth';
 
 
+export default async function CheckoutPage() {
+  const session = await auth();
 
+  if (!session?.user) {
+    redirect('/login');
+  }
 
-const CheckoutPage = async () => {
-
-    const session = await auth();
-  
-    if (!session?.user) {
-      redirect("/login"); // ← 直接跳轉！
-    }
-  return(
-    <CheckoutForm />
-  )
+  return (
+    <StripeProvider>
+      <CheckoutForm />
+    </StripeProvider>
+  );
 }
-
-export default CheckoutPage

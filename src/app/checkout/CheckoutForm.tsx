@@ -25,6 +25,7 @@ import {
   AlertCircle,
   ChevronDown,
   ChevronUp,
+  ChevronLeft, // 新增這個
   Tag,
   User,
   Store,
@@ -33,8 +34,9 @@ import {
   Gem,
   Star,
   Clock,
+  Landmark,
+  CreditCard,
 } from 'lucide-react';
-import { createOrder } from '@/action/Order/route';
 import { toast } from 'sonner';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -42,15 +44,25 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { UserMembership } from '@prisma/client';
 
+// Stripe 相關匯入（簡化）
+import { loadStripe } from '@stripe/stripe-js';
+
+// Server Actions
+import { createOrder, createStripeCheckoutSession } from '@/action/Order/route';
+
 // 定義結帳表單 schema
 const checkoutSchema = z.object({
   shippingName: z.string().min(2, { message: '請輸入收件人姓名（至少 2 個字）' }),
-  shippingPhone: z.string().regex(/^09\d{8}$/, { message: '請輸入正確的手機號碼（09 開頭共 10 碼）' }),
-  shippingAddress: z.string().min(5, { message: '請輸入完整地址（至少 5 個字）' }),
+  shippingPhone: z.string().regex(/^\d{8}$/, { message: '請輸入正確的手機號碼（8 位數字）' }),
+  shippingAddress: z.string().min(0, { message: '請輸入完整地址' }),
   shippingMethod: z.enum(['delivery', 'pickup']),
   notes: z.string().optional(),
   transferProof: z.instanceof(File).optional(),
   selectedDiscounts: z.array(z.string()).optional(),
+  paymentMethod: z.enum(['stripe', 'bank_transfer'])
+    .refine(val => val !== undefined, {
+      message: '請選擇支付方式',
+    }),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -89,13 +101,10 @@ type DiscountResponse = {
 
 const fetcher = (url: string) =>
   fetch(url).then((res) => {
-    if (!res.ok) {
-      throw new Error('API 請求失敗');
-    }
+    if (!res.ok) throw new Error('API 請求失敗');
     return res.json();
   });
 
-// 會員等級映射
 const membershipConfig = {
   FREE: {
     name: '免費會員',
@@ -134,6 +143,10 @@ const membershipConfig = {
 export default function CheckoutForm() {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
+  // 狀態管理
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
   const [showAllDiscounts, setShowAllDiscounts] = useState(false);
   const [selectedDiscountIds, setSelectedDiscountIds] = useState<string[]>([]);
   const [shippingMethod, setShippingMethod] = useState<'delivery' | 'pickup'>('delivery');
@@ -145,16 +158,13 @@ export default function CheckoutForm() {
     async function fetchCartData() {
       try {
         const response = await fetch('/api/cart/total');
-        if (!response.ok) {
-          throw new Error('購物車 API 請求失敗');
-        }
+        if (!response.ok) throw new Error('購物車 API 請求失敗');
         const data = await response.json();
 
         if (data.success) {
           setCartSubtotal(data.subtotal);
           setCartItemsCount(data.itemsCount);
         } else {
-          console.error('購物車 API 錯誤:', data.error);
           toast.error('無法取得購物車資料');
         }
       } catch (error) {
@@ -166,20 +176,17 @@ export default function CheckoutForm() {
     fetchCartData();
   }, []);
 
-  // 從後端取得即時折扣資訊 - 修正這裡
-  const { 
-    data: discountData, 
-    isLoading: discountLoading, 
-    mutate 
+  // 取得即時折扣資訊
+  const {
+    data: discountData,
+    isLoading: discountLoading,
+    mutate,
   } = useSWR<DiscountResponse>(
     cartSubtotal > 0 ? `/api/checkout/discounts?shippingMethod=${shippingMethod}&subtotal=${cartSubtotal}` : null,
     fetcher,
     {
       revalidateOnFocus: false,
-      onError: (error) => {
-        console.error('獲取折扣資訊失敗:', error);
-        toast.error('無法取得折扣資訊');
-      },
+      onError: () => toast.error('無法取得折扣資訊'),
     }
   );
 
@@ -192,109 +199,95 @@ export default function CheckoutForm() {
       shippingMethod: 'delivery',
       notes: '',
       selectedDiscounts: [],
+      paymentMethod: undefined,
     },
   });
 
-  // 當物流方式改變時重新計算折扣
+  // 物流方式改變時重新計算折扣
   useEffect(() => {
     if (shippingMethod && cartSubtotal > 0) {
       mutate();
     }
   }, [shippingMethod, cartSubtotal, mutate]);
 
-  // const onSubmit = (data: CheckoutFormData) => {
-  //   const formData = new FormData();
+  const onSubmit = async (data: CheckoutFormData) => {
+    const formData = new FormData();
+    formData.append('shippingName', data.shippingName);
+    formData.append('shippingPhone', data.shippingPhone);
+    formData.append('shippingAddress', data.shippingAddress);
+    formData.append('shippingMethod', data.shippingMethod);
 
-  //   formData.append('shippingName', data.shippingName);
-  //   formData.append('shippingPhone', data.shippingPhone);
-  //   formData.append('shippingAddress', data.shippingAddress);
-  //   formData.append('shippingMethod', data.shippingMethod);
+    const shippingFee = data.shippingMethod === 'pickup' ? 0 : 100;
+    formData.append('shippingFee', shippingFee.toString());
 
-  //   const shippingFee = data.shippingMethod === 'pickup' ? 0 : 100;
-  //   formData.append('shippingFee', shippingFee.toString());
-
-  //   if (data.notes) formData.append('notes', data.notes);
-  //   if (data.transferProof) {
-  //     formData.append('transferProof', data.transferProof);
-  //   }
-
-  //   if (selectedDiscountIds.length > 0) {
-  //     formData.append('selectedDiscounts', JSON.stringify(selectedDiscountIds));
-  //   }
-
-  //   startTransition(async () => {
-  //     try {
-  //       const result = await createOrder(formData);
-
-  //       if (result && 'success' in result && !result.success) {
-  //         toast.error(result.error ?? '訂單建立失敗');
-  //         return;
-  //       }
-
-  //       toast.success('訂單已成功建立');
-  //       router.push('/checkout/success');
-  //       router.refresh();
-  //     } catch (error) {
-  //       toast.error('訂單建立失敗，請稍後再試');
-  //     }
-  //   });
-  // };
-
-const onSubmit = (data: CheckoutFormData) => {
-  const formData = new FormData();
-
-  formData.append('shippingName', data.shippingName);
-  formData.append('shippingPhone', data.shippingPhone);
-  formData.append('shippingAddress', data.shippingAddress);
-  formData.append('shippingMethod', data.shippingMethod);
-
-  const shippingFee = data.shippingMethod === 'pickup' ? 0 : 100;
-  formData.append('shippingFee', shippingFee.toString());
-
-  if (data.notes) formData.append('notes', data.notes);
-  if (data.transferProof) {
-    formData.append('transferProof', data.transferProof);
-  }
-
-  if (selectedDiscountIds.length > 0) {
-    formData.append('selectedDiscounts', JSON.stringify(selectedDiscountIds));
-  }
-
-  startTransition(async () => {
-    try {
-      const result = await createOrder(formData);
-
-      if (result && 'success' in result && !result.success) {
-        toast.error(result.error ?? '訂單建立失敗');
-        return;
-      }
-
-      toast.success('訂單已成功建立');
-      router.push('/checkout/success');
-      router.refresh();
-    } catch (err) {
-      console.error('訂單建立失敗:', err);
-      const errorMessage = err instanceof Error ? err.message : '訂單建立失敗';
-      toast.error(`訂單建立失敗: ${errorMessage}`);
+    if (data.notes) formData.append('notes', data.notes);
+    if (data.transferProof) {
+      formData.append('transferProofImg', data.transferProof);
     }
-  });
-};
 
-  const handleDiscountToggle = (discountId: string) => {
-    setSelectedDiscountIds((prev) => {
-      if (prev.includes(discountId)) {
-        return prev.filter((id) => id !== discountId);
-      } else {
-        return [...prev, discountId];
+    if (selectedDiscountIds.length > 0) {
+      formData.append('selectedDiscounts', JSON.stringify(selectedDiscountIds));
+    }
+
+    formData.append('paymentMethod', data.paymentMethod);
+
+    startTransition(async () => {
+      try {
+        // 1. 建立訂單
+        const orderResult = await createOrder(formData);
+
+        if (!orderResult.success || !orderResult.orderId) {
+          toast.error(orderResult.error || '訂單建立失敗');
+          return;
+        }
+
+        setOrderId(orderResult.orderId);
+
+        // 2. 根據支付方式處理
+        if (data.paymentMethod === 'stripe') {
+          // 建立 Stripe Checkout Session
+          const checkoutResult = await createStripeCheckoutSession(orderResult.orderId);
+
+          if (!checkoutResult.success || !checkoutResult.url) {
+            toast.error(checkoutResult.error || '無法建立支付頁面');
+            return;
+          }
+
+          // 設置重定向 URL
+          setRedirectUrl(checkoutResult.url);
+          toast.info('即將跳轉至支付頁面...');
+          
+        } else {
+          // 銀行轉帳
+          toast.success('訂單已建立，請完成轉帳');
+          router.push(`/checkout/success?orderId=${orderResult.orderId}&method=bank_transfer`);
+        }
+      } catch (err) {
+        console.error('結帳流程錯誤:', err);
+        toast.error('發生錯誤，請稍後再試');
       }
     });
   };
 
-  // 安全存取折扣資料，提供預設值
+  // 處理 Stripe 重定向
+  const handleStripeRedirect = () => {
+    if (redirectUrl) {
+      window.location.href = redirectUrl;
+    }
+  };
+
+  const handleDiscountToggle = (discountId: string) => {
+    setSelectedDiscountIds((prev) =>
+      prev.includes(discountId) ? prev.filter((id) => id !== discountId) : [...prev, discountId]
+    );
+  };
+
+  // 安全存取折扣資料
   const subtotal = discountData?.subtotal ?? cartSubtotal;
   const shippingFee = discountData?.shippingFee ?? (shippingMethod === 'pickup' ? 0 : 100);
   const discountAmount = discountData?.discountAmount ?? 0;
-  const finalTotal = discountData?.finalTotal ?? (subtotal + shippingFee);
+  const finalTotal = discountData?.finalTotal ?? subtotal + shippingFee;
+
   const availableDiscounts = discountData?.availableDiscounts ?? [];
   const unavailableDiscounts = discountData?.unavailableDiscounts ?? [];
   const userMembership = discountData?.userMembership ?? { level: 'FREE', info: null };
@@ -305,12 +298,6 @@ const onSubmit = (data: CheckoutFormData) => {
 
   const ninetyPercentDiscountId = availableDiscounts.find((d) => d.value === 90 && d.isPercent)?.id;
   const hasNinetyPercentDiscount = ninetyPercentDiscountId ? selectedDiscountIds.includes(ninetyPercentDiscountId) : false;
-
-  // 計算 90% 折扣的價格（如果需要可以加回）
-  // const calculate90PercentDiscount = (baseAmount: number) => {
-  //   return Math.floor(baseAmount * 0.9);
-  // };
-  // const priceAfter90Discount = calculate90PercentDiscount(subtotal + shippingFee);
 
   return (
     <Card className="max-w-2xl mx-auto">
@@ -371,7 +358,7 @@ const onSubmit = (data: CheckoutFormData) => {
                 </p>
               </div>
             </div>
-            <Badge variant="outline">總計: ${(cartSubtotal + shippingFee).toLocaleString()}</Badge>
+            <Badge variant="outline">總計: ${(subtotal + shippingFee).toLocaleString()}</Badge>
           </div>
         </div>
 
@@ -492,10 +479,6 @@ const onSubmit = (data: CheckoutFormData) => {
                           <div className="text-xs text-muted-foreground line-through">
                             ${(subtotal + shippingFee).toLocaleString()}
                           </div>
-                          {/* 此處原本有 priceAfter90Discount，可視需求加回 */}
-                          {/* <div className="text-sm font-bold text-red-700">
-                            僅需 ${priceAfter90Discount.toLocaleString()}
-                          </div> */}
                         </div>
                       </div>
                     </div>
@@ -703,7 +686,7 @@ const onSubmit = (data: CheckoutFormData) => {
                   <FormItem>
                     <FormLabel>手機號碼</FormLabel>
                     <FormControl>
-                      <Input placeholder="0912345678" {...field} />
+                      <Input placeholder="91234567" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -719,13 +702,13 @@ const onSubmit = (data: CheckoutFormData) => {
                   <FormLabel>收件地址</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="台北市中山區XX路XX號"
+                      placeholder="XX區XX路XX號"
                       {...field}
                       disabled={shippingMethod === 'pickup'}
                     />
                   </FormControl>
                   {shippingMethod === 'pickup' && (
-                    <p className="text-sm text-muted-foreground">門市自取無需填寫地址</p>
+                    <p className="text-sm text-muted-foreground mt-1">門市自取無需填寫地址</p>
                   )}
                   <FormMessage />
                 </FormItem>
@@ -770,22 +753,127 @@ const onSubmit = (data: CheckoutFormData) => {
               )}
             />
 
-            <Button
-              type="submit"
-              className="w-full"
-              size="lg"
-              disabled={isPending || discountLoading || cartSubtotal === 0}
-            >
-              {cartSubtotal === 0 ? (
-                '購物車為空'
-              ) : isPending ? (
-                <>
-                  處理訂單中... <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                </>
-              ) : (
-                '確認送出訂單'
+            {/* 支付方式選擇（簡化版） */}
+            <FormField
+              control={form.control}
+              name="paymentMethod"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>支付方式</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                    >
+                      <div className={`border rounded-lg p-4 cursor-pointer transition-all ${field.value === 'stripe' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                        <div className="flex items-center space-x-3">
+                          <RadioGroupItem value="stripe" id="stripe" />
+                          <Label htmlFor="stripe" className="flex-1 cursor-pointer">
+                            <div className="flex items-center gap-3">
+                              <CreditCard className="h-5 w-5 text-blue-600" />
+                              <div>
+                                <p className="font-medium">信用卡 / 電子支付</p>
+                                <p className="text-sm text-muted-foreground">使用 Stripe 安全支付</p>
+                              </div>
+                            </div>
+                          </Label>
+                        </div>
+                      </div>
+
+                      <div className={`border rounded-lg p-4 cursor-pointer transition-all ${field.value === 'bank_transfer' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                        <div className="flex items-center space-x-3">
+                          <RadioGroupItem value="bank_transfer" id="bank_transfer" />
+                          <Label htmlFor="bank_transfer" className="flex-1 cursor-pointer">
+                            <div className="flex items-center gap-3">
+                              <Landmark className="h-5 w-5 text-green-600" />
+                              <div>
+                                <p className="font-medium">銀行轉帳</p>
+                                <p className="text-sm text-muted-foreground">轉帳後上傳證明</p>
+                              </div>
+                            </div>
+                          </Label>
+                        </div>
+                      </div>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </Button>
+            />
+
+            {/* Stripe 重定向按鈕 */}
+            {redirectUrl && (
+              <div className="p-6 border rounded-lg bg-blue-50 space-y-4">
+                <div className="flex items-center gap-3">
+                  <CreditCard className="h-8 w-8 text-blue-600" />
+                  <div>
+                    <h3 className="font-semibold text-lg">準備完成！</h3>
+                    <p className="text-sm text-gray-600">即將跳轉至 Stripe 安全支付頁面</p>
+                  </div>
+                </div>
+                
+                <div className="bg-white p-4 rounded-md border">
+                  <p className="text-sm mb-3">訂單編號: <span className="font-mono">{orderId}</span></p>
+                  <p className="text-sm mb-3">支付金額: <span className="font-bold text-lg">${finalTotal.toLocaleString()}</span></p>
+                  <Button
+                    type="button"
+                    onClick={handleStripeRedirect}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    size="lg"
+                  >
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    前往 Stripe 支付頁面
+                  </Button>
+                </div>
+                
+                <div className="text-xs text-gray-500 text-center">
+                  <p>點擊按鈕後將在新視窗開啟 Stripe 支付頁面</p>
+                  <p className="mt-1">支付完成後將自動返回本站</p>
+                </div>
+              </div>
+            )}
+
+            {/* 提交按鈕（只有沒有 redirectUrl 時顯示） */}
+            {!redirectUrl && (
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                disabled={
+                  isPending ||
+                  discountLoading ||
+                  cartSubtotal === 0 ||
+                  !form.watch('paymentMethod')
+                }
+              >
+                {cartSubtotal === 0 ? (
+                  '購物車為空'
+                ) : isPending ? (
+                  <>
+                    處理中... <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  </>
+                ) : (
+                  '下一步：前往支付'
+                )}
+              </Button>
+            )}
+
+            {/* 返回修改按鈕（當有 redirectUrl 時顯示） */}
+            {redirectUrl && (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  setRedirectUrl(null);
+                  toast.info('可以修改訂單資訊');
+                }}
+              >
+                <ChevronLeft className="mr-2 h-4 w-4" />
+                返回修改訂單
+              </Button>
+            )}
           </form>
         </Form>
       </CardContent>

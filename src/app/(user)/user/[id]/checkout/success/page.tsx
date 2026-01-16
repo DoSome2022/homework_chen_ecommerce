@@ -1,21 +1,27 @@
 // src/app/(user)/checkout/success/page.tsx
+
 import { redirect } from "next/navigation";
-import SuccessClient from "../component/Success";
 import { auth } from "../../../../../../../auth";
+import SuccessClient from "../component/Success";
 
 
 export default async function SuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ order?: string }>;
+  searchParams: Promise<{ orderId?: string; session_id?: string; method?: string }>;
 }) {
   const session = await auth();
+  const params = await searchParams;
+  
   if (!session?.user) {
     redirect("/login");
   }
 
-  const { order } = await searchParams;
-  const  userId  = session?.user?.id as string;
-
-  return <SuccessClient orderNumber={order} userId={userId} />;
+  return (
+    <SuccessClient
+      orderNumber={params.orderId}
+      userId={session.user.id}
+      paymentMethod={params.method as "stripe" | "bank_transfer" | undefined}
+    />
+  );
 }
