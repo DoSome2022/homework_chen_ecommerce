@@ -43,12 +43,12 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { UserMembership } from '@prisma/client';
+import { createStripeCheckoutSession, createTempOrder } from '@/action/Order/route';
 
-// Stripe 相關匯入（簡化）
-import { loadStripe } from '@stripe/stripe-js';
+import { useSession } from "next-auth/react";
 
 // Server Actions
-import { createOrder, createStripeCheckoutSession } from '@/action/Order/route';
+
 
 // 定義結帳表單 schema
 const checkoutSchema = z.object({
@@ -63,6 +63,7 @@ const checkoutSchema = z.object({
     .refine(val => val !== undefined, {
       message: '請選擇支付方式',
     }),
+  preferredDeliveryTime: z.enum(['全日', '上午', '下午']).optional(),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -143,15 +144,20 @@ const membershipConfig = {
 export default function CheckoutForm() {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-
+ const { data: session } = useSession();
   // 狀態管理
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
-  const [orderId, setOrderId] = useState<string | null>(null);
+  // const [orderId, setOrderId] = useState<string | null>(null);
   const [showAllDiscounts, setShowAllDiscounts] = useState(false);
   const [selectedDiscountIds, setSelectedDiscountIds] = useState<string[]>([]);
   const [shippingMethod, setShippingMethod] = useState<'delivery' | 'pickup'>('delivery');
   const [cartSubtotal, setCartSubtotal] = useState<number>(0);
   const [cartItemsCount, setCartItemsCount] = useState<number>(0);
+//   const [checkoutData, setCheckoutData] = useState<{
+//   formData: FormData;
+//   finalPayableAmount: number;
+// } | null>(null);
+const userId = session?.user?.id;
 
   // 從購物車取得實際金額
   useEffect(() => {
@@ -210,65 +216,99 @@ export default function CheckoutForm() {
     }
   }, [shippingMethod, cartSubtotal, mutate]);
 
-  const onSubmit = async (data: CheckoutFormData) => {
-    const formData = new FormData();
-    formData.append('shippingName', data.shippingName);
-    formData.append('shippingPhone', data.shippingPhone);
-    formData.append('shippingAddress', data.shippingAddress);
-    formData.append('shippingMethod', data.shippingMethod);
+// 修改 onSubmit 函數
+const onSubmit = async (data: CheckoutFormData) => {
+  const formData = new FormData();
+  formData.append('shippingName', data.shippingName);
+  formData.append('shippingPhone', data.shippingPhone);
+  formData.append('shippingAddress', data.shippingAddress);
+  formData.append('shippingMethod', data.shippingMethod);
+  formData.append('preferredDeliveryTime', data.preferredDeliveryTime || '');
+  formData.append('finalTotal', finalPayableAmount.toString());
+  
+  const shippingFee = data.shippingMethod === 'pickup' ? 0 : 100;
+  formData.append('shippingFee', shippingFee.toString());
 
-    const shippingFee = data.shippingMethod === 'pickup' ? 0 : 100;
-    formData.append('shippingFee', shippingFee.toString());
+  if (data.notes) formData.append('notes', data.notes);
+  if (data.transferProof) {
+    formData.append('transferProofImg', data.transferProof);
+  }
 
-    if (data.notes) formData.append('notes', data.notes);
-    if (data.transferProof) {
-      formData.append('transferProofImg', data.transferProof);
-    }
+  if (selectedDiscountIds.length > 0) {
+    formData.append('selectedDiscounts', JSON.stringify(selectedDiscountIds));
+  }
 
-    if (selectedDiscountIds.length > 0) {
-      formData.append('selectedDiscounts', JSON.stringify(selectedDiscountIds));
-    }
+  formData.append('paymentMethod', data.paymentMethod);
 
-    formData.append('paymentMethod', data.paymentMethod);
 
+  // ✅ 銀行轉帳：直接跳轉到成功頁面
+  if (data.paymentMethod === 'bank_transfer') {
+    // 銀行轉帳：先創建暫存訂單
     startTransition(async () => {
       try {
-        // 1. 建立訂單
-        const orderResult = await createOrder(formData);
-
-        if (!orderResult.success || !orderResult.orderId) {
-          toast.error(orderResult.error || '訂單建立失敗');
+        // 創建一個暫存訂單
+        const tempOrderResult = await createTempOrder(formData);
+        
+        if (!tempOrderResult.success || !tempOrderResult.orderId) {
+          toast.error(tempOrderResult.error || '訂單暫存失敗');
           return;
         }
-
-        setOrderId(orderResult.orderId);
-
-        // 2. 根據支付方式處理
-        if (data.paymentMethod === 'stripe') {
-          // 建立 Stripe Checkout Session
-          const checkoutResult = await createStripeCheckoutSession(orderResult.orderId);
-
-          if (!checkoutResult.success || !checkoutResult.url) {
-            toast.error(checkoutResult.error || '無法建立支付頁面');
-            return;
-          }
-
-          // 設置重定向 URL
-          setRedirectUrl(checkoutResult.url);
-          toast.info('即將跳轉至支付頁面...');
-          
-        } else {
-          // 銀行轉帳
-          toast.success('訂單已建立，請完成轉帳');
-          router.push(`/checkout/success?orderId=${orderResult.orderId}&method=bank_transfer`);
-        }
+        
+        router.push(`/user/${userId}/checkout/success?orderId=${tempOrderResult.orderId}&method=bank_transfer`);
       } catch (err) {
-        console.error('結帳流程錯誤:', err);
+        console.error('銀行轉帳流程錯誤:', err);
         toast.error('發生錯誤，請稍後再試');
       }
     });
-  };
+  }
+  
+  // ✅ Stripe：跳轉到支付
+  // if (data.paymentMethod === 'stripe') {
+  //   // Stripe：跳轉到支付頁面（訂單在成功頁面創建）
+  //   // 這裡只跳轉，不創建訂單
+  //   router.push(`/checkout/payment?data=${encodeURIComponent(JSON.stringify({
+  //     shippingName: data.shippingName,
+  //     shippingPhone: data.shippingPhone,
+  //     shippingAddress: data.shippingAddress,
+  //     shippingMethod: data.shippingMethod,
+  //     preferredDeliveryTime: data.preferredDeliveryTime,
+  //     notes: data.notes,
+  //     selectedDiscounts: selectedDiscountIds,
+  //     finalTotal: finalPayableAmount,
+  //     shippingFee: data.shippingMethod === 'pickup' ? 0 : 100,
+  //   }))}`);
+  // }
+  if (data.paymentMethod === 'stripe') {
+    startTransition(async () => {
+      try {
+        // 1. 先建立暫存訂單
+        const tempOrderResult = await createTempOrder(formData);
 
+        if (!tempOrderResult.success || !tempOrderResult.orderId) {
+          toast.error(tempOrderResult.error || '無法建立暫存訂單');
+          return;
+        }
+
+        const orderId = tempOrderResult.orderId;
+
+        // 2. 建立 Stripe Checkout Session
+        const stripeResult = await createStripeCheckoutSession(orderId);
+
+        if (!stripeResult.success || !stripeResult.url) {
+          toast.error(stripeResult.error || '無法建立 Stripe 支付連結');
+          return;
+        }
+
+        // 3. 直接跳轉到 Stripe 官方結帳頁面
+        router.push(stripeResult.url);
+
+      } catch (err) {
+        console.error('Stripe 結帳流程錯誤:', err);
+        toast.error('發生錯誤，請稍後再試');
+      }
+    });
+  }
+};
   // 處理 Stripe 重定向
   const handleStripeRedirect = () => {
     if (redirectUrl) {
@@ -286,7 +326,7 @@ export default function CheckoutForm() {
   const subtotal = discountData?.subtotal ?? cartSubtotal;
   const shippingFee = discountData?.shippingFee ?? (shippingMethod === 'pickup' ? 0 : 100);
   const discountAmount = discountData?.discountAmount ?? 0;
-  const finalTotal = discountData?.finalTotal ?? subtotal + shippingFee;
+  // const finalTotal = discountData?.finalTotal ?? subtotal + shippingFee;
 
   const availableDiscounts = discountData?.availableDiscounts ?? [];
   const unavailableDiscounts = discountData?.unavailableDiscounts ?? [];
@@ -296,9 +336,41 @@ export default function CheckoutForm() {
   const membership = membershipConfig[membershipLevel] || membershipConfig.FREE;
   const MemberIcon = membership.icon;
 
+
+const calculateMemberDiscount = () => {
+  if (membershipLevel === 'FREE') return 0;
+  
+  // 會員等級對應的折扣率
+  const discountRates = {
+    SILVER: 0.95,  // 95折
+    GOLD: 0.9,     // 9折
+    PLATINUM: 0.85 // 85折
+  };
+  
+  const rate = discountRates[membershipLevel] || 1;
+  return rate;
+};
+
+const memberDiscountRate = calculateMemberDiscount();
+const hasMemberDiscount = memberDiscountRate < 1;
+
+const memberDiscountAmount = hasMemberDiscount 
+  ? Math.floor((subtotal + shippingFee) * (1 - memberDiscountRate))
+  : 0;
+
+const finalTotalWithAllDiscounts = (subtotal + shippingFee) - discountAmount - memberDiscountAmount;
+
   const ninetyPercentDiscountId = availableDiscounts.find((d) => d.value === 90 && d.isPercent)?.id;
   const hasNinetyPercentDiscount = ninetyPercentDiscountId ? selectedDiscountIds.includes(ninetyPercentDiscountId) : false;
 
+// 計算 90% 折扣（限時優惠）
+const ninetyPercentDiscountAmount = hasNinetyPercentDiscount 
+  ? Math.floor((subtotal + shippingFee) * 0.1) // 10% 折扣
+  : 0;
+  // 總折扣金額
+const totalDiscountAmount = discountAmount + memberDiscountAmount + ninetyPercentDiscountAmount;
+
+const finalPayableAmount = (subtotal + shippingFee) - totalDiscountAmount;
   return (
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
@@ -358,9 +430,40 @@ export default function CheckoutForm() {
                 </p>
               </div>
             </div>
-            <Badge variant="outline">總計: ${(subtotal + shippingFee).toLocaleString()}</Badge>
+            <Badge variant="outline">
+  總計: ${hasNinetyPercentDiscount 
+    ? Math.floor((subtotal + shippingFee) * 0.9).toLocaleString() 
+    : hasMemberDiscount
+      ? finalTotalWithAllDiscounts.toLocaleString()
+      : (subtotal + shippingFee).toLocaleString()
+  }
+</Badge>
           </div>
         </div>
+
+       
+<div className="space-y-2">
+  {hasMemberDiscount && (
+    <div className="flex justify-between text-sm text-blue-600 font-medium">
+      <span className="flex items-center gap-1">
+        <Crown className="h-4 w-4" />
+        {membership.name}專屬折扣
+        <Badge variant="outline" className="ml-2 text-xs">
+          {Math.round((1 - memberDiscountRate) * 100)}折
+        </Badge>
+      </span>
+      <span>-${memberDiscountAmount.toLocaleString()}</span>
+    </div>
+  )}
+  
+  {/* 原有的限時9折顯示... */}
+  {hasNinetyPercentDiscount && (
+    <div className="flex justify-between text-sm text-red-600 font-medium">
+      <span>限時9折優惠</span>
+      <span>-${Math.floor((subtotal + shippingFee) * 0.1).toLocaleString()}</span>
+    </div>
+  )}
+</div>
 
         {/* 折扣與總額明細區塊 */}
         <div className="border rounded-lg p-6 bg-muted/30">
@@ -629,14 +732,16 @@ export default function CheckoutForm() {
 
             <div className="flex justify-between text-sm text-red-600 font-medium">
               <span>折扣總額</span>
-              <span>-${discountAmount.toLocaleString()}</span>
+                <div className="text-primary text-2xl">
+      ${finalPayableAmount.toLocaleString()}
+    </div>
             </div>
 
             <div className="flex justify-between text-lg font-bold pt-2 border-t">
               <span>應付總額</span>
               <div className="text-right">
                 <div className="text-primary text-2xl">
-                  ${finalTotal.toLocaleString()}
+                  ${finalPayableAmount.toLocaleString()}
                 </div>
                 {hasNinetyPercentDiscount && (
                   <div className="text-sm text-green-600 mt-1">
@@ -714,7 +819,68 @@ export default function CheckoutForm() {
                 </FormItem>
               )}
             />
+{/* 期望送達時間（僅宅配時顯示） */}
+{form.watch('shippingMethod') === 'delivery' && (
+  <FormField
+    control={form.control}
+    name="preferredDeliveryTime"
+    render={({ field }) => (
+      <FormItem className="space-y-3">
+        <FormLabel>期望送達時間（選填）</FormLabel>
+        <FormControl>
+          <RadioGroup
+            onValueChange={field.onChange}
+            defaultValue={field.value}
+            className="grid grid-cols-3 gap-4"
+          >
+            <div className={`border rounded-lg p-4 cursor-pointer transition-all ${field.value === '全日' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="全日" id="全日" />
+                <Label htmlFor="全日" className="flex-1 cursor-pointer">
+                  <div className="text-center">
+                    <Clock className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+                    <p className="font-medium">全日</p>
+                    <p className="text-xs text-muted-foreground">不指定時間</p>
+                  </div>
+                </Label>
+              </div>
+            </div>
 
+            <div className={`border rounded-lg p-4 cursor-pointer transition-all ${field.value === '上午' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="上午" id="上午" />
+                <Label htmlFor="上午" className="flex-1 cursor-pointer">
+                  <div className="text-center">
+                    <Clock className="h-5 w-5 mx-auto mb-1 text-amber-600" />
+                    <p className="font-medium">上午</p>
+                    <p className="text-xs text-muted-foreground">09:00–14:00</p>
+                  </div>
+                </Label>
+              </div>
+            </div>
+
+            <div className={`border rounded-lg p-4 cursor-pointer transition-all ${field.value === '下午' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="下午" id="下午" />
+                <Label htmlFor="下午" className="flex-1 cursor-pointer">
+                  <div className="text-center">
+                    <Clock className="h-5 w-5 mx-auto mb-1 text-blue-600" />
+                    <p className="font-medium">下午</p>
+                    <p className="text-xs text-muted-foreground">14:00–18:00</p>
+                  </div>
+                </Label>
+              </div>
+            </div>
+          </RadioGroup>
+        </FormControl>
+        <FormMessage />
+        <p className="text-sm text-muted-foreground">
+          實際送達時間仍依物流商安排為主，無法完全保證
+        </p>
+      </FormItem>
+    )}
+  />
+)}
             <FormField
               control={form.control}
               name="notes"
@@ -814,8 +980,8 @@ export default function CheckoutForm() {
                 </div>
                 
                 <div className="bg-white p-4 rounded-md border">
-                  <p className="text-sm mb-3">訂單編號: <span className="font-mono">{orderId}</span></p>
-                  <p className="text-sm mb-3">支付金額: <span className="font-bold text-lg">${finalTotal.toLocaleString()}</span></p>
+                  {/* <p className="text-sm mb-3">訂單編號: <span className="font-mono">{orderId}</span></p> */}
+                  <p className="text-sm mb-3">支付金額: <span className="font-bold text-lg">${finalPayableAmount.toLocaleString()}</span></p>
                   <Button
                     type="button"
                     onClick={handleStripeRedirect}

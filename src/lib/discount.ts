@@ -28,79 +28,95 @@ export async function calculateDiscountedTotal(
 ) {
   const session = await auth();
   const userId = session?.user?.id;
-  
+
   // 獲取用戶實際的會員等級
   let userMembershipLevel: MembershipLevel = MembershipLevel.FREE;
-  
-  if (userId) {
-    const user = await db.user.findUnique({
-      where: { id: userId },
-      select: { currentMembershipLevel: true }
-    });
-    
-    // 確保使用正確的 enum 值
-    if (user?.currentMembershipLevel) {
-      userMembershipLevel = user.currentMembershipLevel;
+if (userId) {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { 
+      currentMembershipLevel: true,
+      username: true,   // 方便辨識是誰
+      email: true
     }
-    
-    console.log('用戶會員等級 (資料庫):', userMembershipLevel);
-  }
+  });
   
-  // 檢查是否為會員（非 FREE 即為會員）
-  const isMember = userMembershipLevel !== MembershipLevel.FREE;
-  console.log('是否為會員:', isMember, '會員等級:', userMembershipLevel);
+  console.log('[discount calc] 使用者資訊:', {
+    userId,
+    username: user?.username,
+    email: user?.email,
+    currentMembershipLevel: user?.currentMembershipLevel ?? '未找到 / null',
+  });
 
+  if (user?.currentMembershipLevel) {
+    userMembershipLevel = user.currentMembershipLevel;
+  }
+}
+
+  const isPaidMember = 
+    userMembershipLevel === MembershipLevel.SILVER ||
+    userMembershipLevel === MembershipLevel.GOLD ||
+    userMembershipLevel === MembershipLevel.PLATINUM;
+
+console.log('[discount calc] 會員判斷結果:', {
+    level: userMembershipLevel,
+    isPaidMember,
+  });
+
+  // 計算原始商品小計
   const subtotal = cartItems.reduce((sum, item) => {
-    const price = item.product.price ? parseInt(item.product.price) : 0;
+    const price = item.product.price ? parseInt(item.product.price, 10) : 0;
     return sum + price * item.quantity;
   }, 0);
 
-  // 取得所有有效的折扣規則
-  const now = new Date();
-  const activeDiscounts = await db.discount.findMany({
-    where: {
-      startAt: { lte: now },
-      OR: [{ endAt: null }, { endAt: { gte: now } }],
-    },
-  });
+  const shippingFee = shippingMethod === 'pickup' ? 0 : 100;
 
-  let finalTotal = subtotal;
+  let discountAmount = 0;
   const appliedDiscounts: string[] = [];
 
-  // 處理用戶選擇的折扣
-  for (const discount of [...activeDiscounts, ...userSelectedDiscounts]) {
-    // 避免重複處理同一個折扣
-    if (appliedDiscounts.includes(discount.name)) continue;
-
-    // 檢查適用條件
-    const isApplicable = checkDiscountApplicable(
-      discount, 
-      isMember, 
-      userMembershipLevel, // 傳入完整的會員等級
-      shippingMethod, 
-      subtotal
-    );
-
-    if (isApplicable) {
-      let discountAmount = 0;
-      if (discount.isPercent) {
-        discountAmount = Math.floor(subtotal * discount.value / 100);
-      } else {
-        discountAmount = discount.value;
-      }
-
-      finalTotal = Math.max(0, finalTotal - discountAmount);
-      appliedDiscounts.push(discount.name);
-      console.log(`套用折扣: ${discount.name}, 金額: ${discountAmount}`);
-    }
+  // 第一步：自動套用會員 9 折（僅商品小計）
+  let discountedSubtotal = subtotal;
+  if (isPaidMember) {
+    const memberDiscount = Math.round(subtotal * 0.1); // 省 10%
+    discountAmount += memberDiscount;
+    discountedSubtotal = subtotal - memberDiscount;
+    appliedDiscounts.push(`${userMembershipLevel} 會員專屬 9 折`);
   }
 
-  console.log('最終總額:', finalTotal, '折扣總額:', subtotal - finalTotal);
+  if (isPaidMember) {
+    const memberDiscount = Math.round(subtotal * 0.1); // 10% off
+    discountAmount += memberDiscount;
+    appliedDiscounts.push(`會員 ${userMembershipLevel} 9折 (自動) -$${memberDiscount}`);
+    console.log('[discount calc] 已套用會員折扣:', memberDiscount);
+  }
+
+  // 第二步：處理用戶手動選擇的折扣（基於已打折後的小計）
+  for (const discount of userSelectedDiscounts) {
+    // 檢查是否適用（這裡使用您原有的 checkDiscountApplicable 邏輯）
+    if (!checkDiscountApplicable(discount, isPaidMember, userMembershipLevel, shippingMethod, discountedSubtotal)) {
+      continue;
+    }
+
+    let discAmt = 0;
+    if (discount.isPercent) {
+      discAmt = Math.round(discountedSubtotal * (discount.value / 100));
+    } else {
+      discAmt = discount.value;
+    }
+
+    if (discount.minAmount && discountedSubtotal < discount.minAmount) continue;
+
+    discountAmount += discAmt;
+    appliedDiscounts.push(discount.name);
+  }
+
+  const finalTotal = discountedSubtotal + shippingFee - (discountAmount - (subtotal - discountedSubtotal)); // 修正計算
 
   return {
     subtotal,
-    finalTotal,
-    discountAmount: subtotal - finalTotal,
+    shippingFee,
+    discountAmount,
+    finalTotal: Math.max(0, finalTotal),
     appliedDiscounts,
   };
 }

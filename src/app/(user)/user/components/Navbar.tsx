@@ -1,16 +1,18 @@
 // src/app/components/Navbar.tsx 或正確路徑
 "use client";
 
-import { logoutAction } from "@/lib/auth/LogOut";
-import { useRouter } from "next/navigation";
+
+// import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useSession } from "next-auth/react"; // ← 關鍵！用 next-auth 的 hook
+import { signOut, useSession } from "next-auth/react"; // ← 關鍵！用 next-auth 的 hook
 import { useEffect, useState } from "react";
+// import { logoutAction } from "@/action/Auth/route";
+// import { signOut } from "../../../../../auth";
 
 export default function Navbar() {
   const { data: session, status } = useSession(); // ← 標準寫法
-  const router = useRouter();
+  // const router = useRouter();
   const [userId, setUserId] = useState<string>("");
 
   // 當 session 載入完成後設定 userId
@@ -22,14 +24,19 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await logoutAction();
-      router.push("/");
-      router.refresh();
+      // 使用 next-auth/react 的 signOut
+      await signOut({ 
+        redirect: false, 
+        callbackUrl: "/login" 
+      });
+      
+      // 强制刷新页面以清除所有状态
+      window.location.href = "/login";
     } catch (error) {
-      console.error("登出失敗:", error);
+      console.error("Logout error:", error);
+      window.location.href = "/login"; // 无论如何都跳转到登录页
     }
   };
-
   // 載入中或無 session 時的處理
   if (status === "loading") {
     return <nav className="bg-white shadow-sm border-b h-16" />; // 骨架

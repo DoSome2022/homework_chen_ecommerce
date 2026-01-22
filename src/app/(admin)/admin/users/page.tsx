@@ -1,10 +1,13 @@
+// src/app/(admin)/admin/users/page.tsx 或您的檔案路徑
 'use client';
 
-import useSWR, { useSWRConfig } from 'swr';  // ← 新增 useSWRConfig
+import useSWR, { useSWRConfig } from 'swr';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Edit, Trash2 } from 'lucide-react';
+import { Input } from '@/components/ui/input'; // ← 新增 Input
+// import { Label } from '@/components/ui/label'; // ← 可選
+import { Loader2, Edit, Trash2, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import {
@@ -34,7 +37,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -74,17 +76,32 @@ type EditUserFormData = z.infer<typeof editUserSchema>;
 
 export default function UsersPage() {
   const [roleFilter, setRoleFilter] = useState<'USER' | 'ADMIN' | ''>('');
+  const [searchQuery, setSearchQuery] = useState(''); // ← 新增搜尋狀態
   const [openCreate, setOpenCreate] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
-  const { mutate: swrMutate } = useSWRConfig();  // ← 取得全域 mutate
+  const { mutate: swrMutate } = useSWRConfig();
   const currentKey = roleFilter ? `/api/admin/user?role=${roleFilter}` : '/api/admin/user';
 
   const { data: users = [], isLoading } = useSWR<User[]>(
-    roleFilter ? `/api/admin/user?role=${roleFilter}` : '/api/admin/user',
+    currentKey,
     fetcher,
     { revalidateOnFocus: false }
   );
+
+  // 搜尋過濾邏輯（前端過濾）
+  const filteredUsers = users.filter(user => {
+    if (!searchQuery.trim()) return true;
+
+    const query = searchQuery.toLowerCase().trim();
+
+    return (
+      user.username.toLowerCase().includes(query) ||
+      (user.name && user.name.toLowerCase().includes(query)) ||
+      (user.email && user.email.toLowerCase().includes(query)) ||
+      (user.phone && user.phone.includes(query))
+    );
+  });
 
   // 新增表單（password 必填）
   const createForm = useForm<CreateUserFormData>({
@@ -111,23 +128,22 @@ export default function UsersPage() {
   });
 
   const refreshUsers = () => {
-    // 重新驗證目前 key 以及「全部用戶」的 key
     swrMutate(currentKey);
-    swrMutate('/api/admin/users'); // 確保不論篩選狀態都更新
+    swrMutate('/api/admin/user'); // 確保全部用戶也更新
   };
 
-  const onCreateSubmit = async (data: CreateUserFormData) => {
+  // 修復：將 onCreateSubmit 函數改為有實際使用
+  const handleCreateSubmit = async (data: CreateUserFormData) => {
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
       formData.append(key, value);
     });
-
     const result = await createUserAction(formData);
     if (result.success) {
       toast.success(result.message || '用戶新增成功');
       createForm.reset();
       setOpenCreate(false);
-      refreshUsers();  // ← 正確重新載入
+      refreshUsers();
     } else {
       toast.error(result.error || '新增失敗');
     }
@@ -145,7 +161,7 @@ export default function UsersPage() {
     if (result.success) {
       toast.success(result.message || '用戶更新成功');
       setEditingUser(null);
-      refreshUsers();  // ← 正確重新載入
+      refreshUsers();
     } else {
       toast.error(result.error || '更新失敗');
     }
@@ -155,7 +171,7 @@ export default function UsersPage() {
     const result = await deleteUserAction(userId);
     if (result.success) {
       toast.success('用戶刪除成功');
-      refreshUsers();  // ← 正確重新載入
+      refreshUsers();
     } else {
       toast.error(result.error || '刪除失敗');
     }
@@ -176,65 +192,77 @@ export default function UsersPage() {
     return <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin" /></div>;
   }
 
-  console.log("data : ", users , "-- End --")
   return (
     <div className="container mx-auto p-8">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <h1 className="text-3xl font-bold">用戶管理</h1>
 
-        {/* 新增用戶 Dialog */}
-        <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-          <DialogTrigger asChild>
-            <Button>新增用戶</Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>新增一般用戶</DialogTitle>
-            </DialogHeader>
-            <Form {...createForm}>
-              <form onSubmit={createForm.handleSubmit(onCreateSubmit)} className="space-y-4">
-                <FormField control={createForm.control} name="username" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>使用者名稱（必填）</FormLabel>
-                    <FormControl><Input placeholder="輸入使用者名稱" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={createForm.control} name="name" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>姓名（選填）</FormLabel>
-                    <FormControl><Input placeholder="王小明" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={createForm.control} name="email" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email（選填）</FormLabel>
-                    <FormControl><Input type="email" placeholder="example@email.com" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={createForm.control} name="phone" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>手機（選填）</FormLabel>
-                    <FormControl><Input placeholder="0912345678" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={createForm.control} name="password" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>密碼（必填）</FormLabel>
-                    <FormControl><Input type="password" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <DialogFooter>
-                  <Button type="submit">建立用戶</Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+        {/* 搜尋欄 + 新增按鈕 */}
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+          <div className="relative flex-1 min-w-[250px]">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="搜尋用戶名稱、姓名、Email、手機..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <Dialog open={openCreate} onOpenChange={setOpenCreate}>
+            <DialogTrigger asChild>
+              <Button>新增用戶</Button>
+            </DialogTrigger>
+            {/* 新增用戶 Dialog 內容 */}
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>新增用戶</DialogTitle>
+              </DialogHeader>
+              <Form {...createForm}>
+                <form onSubmit={createForm.handleSubmit(handleCreateSubmit)} className="space-y-4">
+                  <FormField control={createForm.control} name="username" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>使用者名稱</FormLabel>
+                      <FormControl><Input {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={createForm.control} name="name" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>姓名（選填）</FormLabel>
+                      <FormControl><Input {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={createForm.control} name="email" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email（選填）</FormLabel>
+                      <FormControl><Input type="email" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={createForm.control} name="phone" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>手機（選填）</FormLabel>
+                      <FormControl><Input {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={createForm.control} name="password" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>密碼</FormLabel>
+                      <FormControl><Input type="password" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <DialogFooter>
+                    <Button type="submit">新增用戶</Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* 角色篩選 */}
@@ -258,58 +286,63 @@ export default function UsersPage() {
 
       {/* 用戶列表 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {users.map((user) => (
-          <Card key={user.id}>
-            <CardHeader>
-              <CardTitle>{user.username}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <p>姓名：{user.name || '無'}</p>
-              <p>Email：{user.email || '無'}</p>
-              <p>電話：{user.phone || '無'}</p>
-              <p>角色：<span className={user.role === 'ADMIN' ? 'text-red-600' : 'text-green-600'}>{user.role}</span></p>
-              <p className="text-sm text-gray-500">建立時間：{new Date(user.createdAt).toLocaleString()}</p>
+        {filteredUsers.length === 0 ? (
+          <div className="col-span-full text-center py-12 text-gray-500">
+            {searchQuery ? "無符合搜尋結果的用戶" : "目前沒有用戶資料"}
+          </div>
+        ) : (
+          filteredUsers.map((user) => (
+            <Card key={user.id}>
+              <CardHeader>
+                <CardTitle>{user.username}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p>姓名：{user.name || '無'}</p>
+                <p>Email：{user.email || '無'}</p>
+                <p>電話：{user.phone || '無'}</p>
+                <p>角色：<span className={user.role === 'ADMIN' ? 'text-red-600' : 'text-green-600'}>{user.role}</span></p>
+                <p className="text-sm text-gray-500">建立時間：{new Date(user.createdAt).toLocaleString()}</p>
 
-              <div className="flex gap-2 pt-4">
-                <Button asChild variant="outline" size="sm">
-                  <Link href={`/admin/users/${user.id}`}>查看詳情</Link>
-                </Button>
+                <div className="flex gap-2 pt-4">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/admin/users/${user.id}`}>查看詳情</Link>
+                  </Button>
 
-                {user.role === 'USER' && (
-                  <>
-                    <Button variant="outline" size="sm" onClick={() => openEditDialog(user)}>
-                      <Edit className="h-4 w-4 mr-1" /> 編輯
-                    </Button>
+                  {user.role === 'USER' && (
+                    <>
+                      <Button variant="outline" size="sm" onClick={() => openEditDialog(user)}>
+                        <Edit className="h-4 w-4 mr-1" /> 編輯
+                      </Button>
 
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="sm">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>確認刪除？</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            刪除用戶 {user.username} 後無法復原，且若有訂單將拒絕刪除。
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>取消</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(user.id)}>
-                            確認刪除
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="sm">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>確認刪除？</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              刪除用戶 {user.username} 後無法復原，且若有訂單將拒絕刪除。
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>取消</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(user.id)}>
+                              確認刪除
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
-
       {/* 編輯 Dialog */}
       <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
         <DialogContent className="max-w-md">

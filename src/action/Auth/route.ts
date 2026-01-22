@@ -7,10 +7,11 @@ import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
 import { z } from "zod";
 
-import { auth, authSignIn } from "../../../auth";
+import { auth, authSignIn, signOut } from "../../../auth";
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { FormState } from "../../../types/auth";
+
 
 
 
@@ -159,4 +160,9 @@ export async function registerAdminAction(
 
   await authSignIn("credentials", { username, password, redirectTo: "/admin" });
   return { success: true };
+}
+
+export async function logoutAction() {
+  await signOut({ redirect: false });
+  
 }

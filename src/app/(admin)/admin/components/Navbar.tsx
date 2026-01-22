@@ -1,23 +1,34 @@
 // src/app/(admin)/admin/components/Navbar.tsx
 "use client";
 
-import { logoutAction } from "@/lib/auth/LogOut";
-import { useRouter } from "next/navigation";
+
+// import { useRouter } from "next/navigation";
 import Link from "next/link"; // ← 加上這行！
 import { Button } from "@/components/ui/button";
+// import { signOut } from "../../../../../auth";
+// import { logoutAction } from "@/action/Auth/route";
+import { signOut } from "next-auth/react";
 
 export default function Navbar() {
-  const router = useRouter();
+  // const router = useRouter();
 
   const handleLogout = async () => {
     try {
-      await logoutAction();
-      router.push("/");
-      router.refresh();
+      // 使用 next-auth/react 的 signOut
+      await signOut({ 
+        redirect: false, 
+        callbackUrl: "/login" 
+      });
+      
+      // 强制刷新页面以清除所有状态
+      window.location.href = "/login";
     } catch (error) {
-      console.error("登出失敗:", error);
+      console.error("Logout error:", error);
+      window.location.href = "/login"; // 无论如何都跳转到登录页
     }
   };
+
+
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">
@@ -44,6 +55,13 @@ export default function Navbar() {
             >
 
               商品
+            </Link>
+            <Link
+              href={`/admin/users/emails`}
+              className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              用戶Email列表
+              
             </Link>
             <Link
               href="/admin/users"
@@ -81,6 +99,12 @@ export default function Navbar() {
               className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             >
               帳目
+            </Link>
+            <Link
+              href="/admin/discounts"
+              className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              拆扣管理
             </Link>
             <Link
               href="/admin/renewals"

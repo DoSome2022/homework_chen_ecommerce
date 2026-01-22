@@ -27,7 +27,7 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+returnRequests ReturnRequest[]
 memberships UserMembership[]
   Order           Order[]
   Cart            Cart[]
@@ -142,6 +142,7 @@ model Order {
   notes                 String?
 
   accountEntry          AccountEntry?
+  returnRequest ReturnRequest?
 
   createdAt DateTime  @default(now())
   paidAt    DateTime?
@@ -271,6 +272,39 @@ model RenewalRequest {
 
   @@index([status])
 }
+
+model ReturnRequest {
+  id          String        @id @default(uuid())
+  orderId     String        @unique
+  order       Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  
+  reason      String        // 退貨原因，例如 "商品損壞"、"不喜歡"、"尺寸不合"
+  description String?       // 詳細說明
+  images      String[]      // 上傳的退貨證明圖片 URL（可選，多張）
+  
+  status      ReturnStatus  @default(PENDING)  // PENDING → APPROVED → REJECTED → REFUNDED
+  requestedAt DateTime      @default(now())
+  processedAt DateTime?
+  processedBy String?       // 處理的管理員 ID
+  notes       String?       // 管理員備註
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status])
+  @@index([orderId])
+}
+
+enum ReturnStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REFUNDED
+}
+
 
 enum RenewalStatus {
   PENDING

@@ -38,7 +38,7 @@ export default function UserDetailPage() {
   const params = useParams();
   const userId = params.userId as string;
 
-  const { data: user, isLoading } = useSWR<UserDetail>(`/api/admin/users/${userId}`, fetcher);
+  const { data: user, isLoading } = useSWR<UserDetail>(`/api/admin/user/${userId}`, fetcher);
 
   const [sortKey, setSortKey] = useState<SortKey>('createdAt');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');

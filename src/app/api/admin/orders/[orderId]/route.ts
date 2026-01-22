@@ -19,6 +19,7 @@ export async function GET(
     const order = await db.order.findUnique({
       where: { id: orderId },
       include: {
+        returnRequest: true,
         user: {                         // ← 只要這一個！
           select: {
             id: true,
