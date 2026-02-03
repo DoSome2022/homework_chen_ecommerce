@@ -15,45 +15,61 @@ const authOptions: NextAuthConfig = {
         username: { label: 'Username', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
-        if (!credentials?.username || !credentials?.password) {
-          return null;
-        }
+async authorize(credentials) {
+  console.log('收到登入請求，憑證資料：', credentials);
 
-        const username = credentials.username as string;
-        const password = credentials.password as string;
+  if (!credentials?.username || !credentials?.password) {
+    console.log('缺少 username 或 password');
+    return null;
+  }
 
-        const user = await db.user.findUnique({
-          where: { username },
-          select: {
-            id: true,
-            username: true,
-            email: true,
-            name: true,
-            role: true,
-            passwordHash: true,
-            currentMembershipLevel: true,
-          },
-        });
+  const username = credentials.username as string;
+  console.log('嘗試登入的使用者名稱：', username);
 
-        if (!user || !user.passwordHash) {
-          return null;
-        }
+  const user = await db.user.findUnique({
+    where: { username },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      name: true,
+      role: true,
+      passwordHash: true,
+      currentMembershipLevel: true,
+    },
+  });
 
-        const isValid = await bcrypt.compare(password, user.passwordHash);
-        if (!isValid) {
-          return null;
-        }
+  if (!user) {
+    console.log(`找不到使用者：${username}`);
+    return null;
+  }
 
-        return {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          currentMembershipLevel: user.currentMembershipLevel,
-        };
-      },
+  console.log('找到使用者：', user.username, '是否有密碼欄位：', !!user.passwordHash);
+
+  if (!user.passwordHash) {
+    console.log(`使用者 ${username} 沒有設定密碼（可能是 Google 註冊帳號）`);
+    return null;
+  }
+
+  const isValid = await bcrypt.compare(credentials.password as string, user.passwordHash);
+  console.log(`密碼比對結果：${isValid} （輸入密碼：${credentials.password}）`);
+
+  if (!isValid) {
+    console.log(`密碼錯誤，使用者：${username}`);
+    return null;
+  }
+
+  console.log(`登入成功，使用者：${username}`);
+
+  return {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    currentMembershipLevel: user.currentMembershipLevel,
+  };
+}
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,

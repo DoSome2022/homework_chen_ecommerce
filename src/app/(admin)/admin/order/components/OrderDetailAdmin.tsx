@@ -19,7 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toggleItemPickedAction, completePickingAction } from "@/action/Order/route";
 
 // PDF 相關 import
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
 
 // 確保 date-fns 正確匯入
