@@ -1,7 +1,9 @@
 // src/app/page.tsx
-import TrackingPageClient from "@/components/Tracking/TrackingPageClient";
+
+import ShopProductListsPublic from "@/components/Public/ShopList";
 import { auth } from "../../auth";
 import { redirect } from "next/navigation";
+
 
 // Server Component - 負責身份驗證和數據獲取
 export default async function HomePage() {
@@ -18,5 +20,13 @@ export default async function HomePage() {
   }
 
   // 未登入：顯示追蹤頁面
-  return <TrackingPageClient />;
+  // return <TrackingPageClient />;
+  return(
+      <>
+      
+   <ShopProductListsPublic/>
+  </>
+  )
+
+ 
 }
