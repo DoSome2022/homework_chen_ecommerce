@@ -56,7 +56,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
             <CardContent className="space-y-6">
               <div>
                 <p className="text-sm text-gray-500">價格</p>
-                <p className="text-3xl font-bold text-primary">NT${product.price}</p>
+                <p className="text-3xl font-bold text-primary">${product.price}</p>
               </div>
               {product.des && (
                 <div>

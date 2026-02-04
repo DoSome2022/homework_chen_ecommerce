@@ -178,7 +178,7 @@ export default function CartClient() {
                       <Badge variant="secondary">{item.unit}</Badge>
                     </div>
                     <p className="text-xl font-bold text-primary">
-                      NT${item.product.price || "0"}
+                      ${item.product.price || "0"}
                     </p>
                   </div>
 
@@ -252,7 +252,7 @@ export default function CartClient() {
                 <div className="border-t pt-6">
                   <div className="flex justify-between text-2xl font-bold mb-6">
                     <span>總計</span>
-                    <span className="text-primary">NT${total.toLocaleString()}</span>
+                    <span className="text-primary">${total.toLocaleString()}</span>
                   </div>
 
                   <Button

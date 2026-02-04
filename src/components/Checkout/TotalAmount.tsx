@@ -7,5 +7,5 @@ import { useCart } from "@/hooks/use-cart";
 
 export default function TotalAmount() {
   const { totalAmount } = useCart();
-  return <>NT${totalAmount.toLocaleString()}</>;
+  return <>${totalAmount.toLocaleString()}</>;
 }

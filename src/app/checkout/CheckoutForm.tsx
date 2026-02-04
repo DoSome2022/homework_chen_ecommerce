@@ -64,6 +64,7 @@ const checkoutSchema = z.object({
       message: '請選擇支付方式',
     }),
   preferredDeliveryTime: z.enum(['全日', '上午', '下午']).optional(),
+  
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -218,6 +219,7 @@ const userId = session?.user?.id;
 
 // 修改 onSubmit 函數
 const onSubmit = async (data: CheckoutFormData) => {
+  console.log("data : " , data , "-- Ends --")
   const formData = new FormData();
   formData.append('shippingName', data.shippingName);
   formData.append('shippingPhone', data.shippingPhone);
@@ -230,9 +232,9 @@ const onSubmit = async (data: CheckoutFormData) => {
   formData.append('shippingFee', shippingFee.toString());
 
   if (data.notes) formData.append('notes', data.notes);
-  if (data.transferProof) {
-    formData.append('transferProofImg', data.transferProof);
-  }
+if (data.transferProof) {
+  formData.append('transferProof', data.transferProof);  // ← 改成 'transferProof'
+}
 
   if (selectedDiscountIds.length > 0) {
     formData.append('selectedDiscounts', JSON.stringify(selectedDiscountIds));
@@ -262,22 +264,7 @@ const onSubmit = async (data: CheckoutFormData) => {
     });
   }
   
-  // ✅ Stripe：跳轉到支付
-  // if (data.paymentMethod === 'stripe') {
-  //   // Stripe：跳轉到支付頁面（訂單在成功頁面創建）
-  //   // 這裡只跳轉，不創建訂單
-  //   router.push(`/checkout/payment?data=${encodeURIComponent(JSON.stringify({
-  //     shippingName: data.shippingName,
-  //     shippingPhone: data.shippingPhone,
-  //     shippingAddress: data.shippingAddress,
-  //     shippingMethod: data.shippingMethod,
-  //     preferredDeliveryTime: data.preferredDeliveryTime,
-  //     notes: data.notes,
-  //     selectedDiscounts: selectedDiscountIds,
-  //     finalTotal: finalPayableAmount,
-  //     shippingFee: data.shippingMethod === 'pickup' ? 0 : 100,
-  //   }))}`);
-  // }
+
   if (data.paymentMethod === 'stripe') {
     startTransition(async () => {
       try {

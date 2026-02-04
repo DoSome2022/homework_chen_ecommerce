@@ -162,7 +162,7 @@ export default function ProductListPage() {
 
                 <CardContent className="space-y-3">
                   <p className="text-2xl font-bold text-primary">
-                    NT${product.price || "0"}
+                    ${product.price || "0"}
                   </p>
 
                   <p className="text-sm text-gray-600">

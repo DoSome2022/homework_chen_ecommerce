@@ -86,7 +86,7 @@ export default function OrderLists() {
                 <div>
                   <p>收件人：{order.shippingName}</p>
                   <p className="text-2xl font-bold text-primary mt-4">
-                    NT${order.total.toLocaleString()}
+                    ${order.total.toLocaleString()}
                   </p>
                 </div>
                 <Button asChild>

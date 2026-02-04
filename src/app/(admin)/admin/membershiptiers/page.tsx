@@ -217,7 +217,7 @@ export default function MembershipTiersPage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">代碼：{tier.level}</p>
-              <p className="font-medium mt-2">年費：NT${tier.price}</p>
+              <p className="font-medium mt-2">年費：${tier.price}</p>
               <div className="mt-3">
                 <p className="text-sm font-medium">權益：</p>
                 <div className="flex flex-wrap gap-1 mt-1">

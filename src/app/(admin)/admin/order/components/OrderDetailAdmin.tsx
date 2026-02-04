@@ -435,6 +435,22 @@ export default function OrderDetailAdmin({ orderId }: { orderId: string }) {
 
         {/* 右側：訂單摘要 + 退貨處理 */}
         <div className="space-y-6">
+          {order.transferProofImg && (
+  <Card>
+    <CardHeader>
+      <CardTitle>轉帳證明</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <Image
+        src={order.transferProofImg}
+        alt="轉帳證明"
+        width={300}
+        height={300}
+        className="mt-2 rounded-lg object-cover border"
+      />
+    </CardContent>
+  </Card>
+)}
           <Card className="sticky top-6">
             <CardHeader>
               <CardTitle className="flex justify-between items-center">

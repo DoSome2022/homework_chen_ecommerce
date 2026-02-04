@@ -125,7 +125,7 @@ export default function CartPage() {
                 <h3 className="font-semibold">{item.product.title}</h3>
                 <p className="text-sm text-muted-foreground">單位：{item.unit}</p>
                 <p className="text-lg font-bold mt-2">
-                  NT${item.product.price}
+                  ${item.product.price}
                 </p>
               </div>
 

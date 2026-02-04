@@ -9,6 +9,15 @@ import { calculateDiscountedTotal } from '@/lib/discount';
 import { auth } from '../../../auth';
 import { Discount } from '@prisma/client';
 import { ReturnStatus } from "@prisma/client";  // ← 加入這行
+import OSS from "ali-oss";
+
+
+const ossClient = new OSS({
+  region: process.env.OSS_REGION!,
+  accessKeyId: process.env.OSS_ACCESS_KEY_ID!,
+  accessKeySecret: process.env.OSS_ACCESS_KEY_SECRET!,
+  bucket: process.env.OSS_BUCKET!,
+});
 
 const checkoutSchema = z.object({
   shippingName: z.string().min(1, '請填寫收件人姓名'),
@@ -544,6 +553,34 @@ export async function createTempOrder(formData: FormData) {
     }
 
     const userId = session.user.id;
+
+    // 取得檔案
+  const proofFile = formData.get('transferProof') as File | null;
+  console.log("proofFile : ", proofFile , "-- End -- ")
+
+  let transferProofImg: string | null = null;
+
+  // 如果有檔案 → 上傳到 OSS
+  if (proofFile && proofFile.size > 0) {
+    try {
+      const buffer = Buffer.from(await proofFile.arrayBuffer());
+      const filename = `transfer-proofs/${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}-${proofFile.name}`;
+      
+      const result = await ossClient.put(filename, buffer);
+      transferProofImg = result.url;
+
+      console.log('[createTempOrder] 轉帳證明上傳成功:', transferProofImg);
+    } catch (uploadErr) {
+      console.error('[createTempOrder] OSS 上傳失敗:', uploadErr);
+      return { success: false, error: '轉帳證明圖片上傳失敗，請重試' };
+    }
+  } else {
+    // 如果選擇銀行轉帳但沒上傳（前端應已擋，但後端再防呆）
+    const paymentMethod = formData.get('paymentMethod') as string;
+    if (paymentMethod === 'bank_transfer') {
+      return { success: false, error: '銀行轉帳必須上傳轉帳證明' };
+    }
+  }
     
     // 解析表單資料
     const rawData = Object.fromEntries(formData);
@@ -598,7 +635,7 @@ export async function createTempOrder(formData: FormData) {
         preferredDeliveryTime: rawData.preferredDeliveryTime as string || null,
         shippingFee: shippingFee,
         notes: notes,
-        transferProofImg: null,
+        transferProofImg,
       },
     });
 
