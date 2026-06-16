@@ -305,7 +305,7 @@ export default function SuccessClient({
                           <h4 className="font-medium text-yellow-800 mb-2">請完成銀行轉帳</h4>
                           <ul className="text-sm text-yellow-700 space-y-1">
                             <li>• 請在 24 小時內完成轉帳</li>
-                            <li>• 轉帳帳號：1234-5678-9012（XX銀行）</li>
+                            <li>• 轉帳帳號：039-735-2-008237-9（集友銀行）</li>
                             <li>• 轉帳金額：{orderDetails.finalTotal ? formatCurrency(orderDetails.finalTotal) : "請查看訂單"}</li>
                             <li>• 轉帳後請至「我的訂單」上傳轉帳證明</li>
                           </ul>
@@ -440,8 +440,8 @@ export default function SuccessClient({
         {/* 頁尾資訊 */}
         <div className="mt-10 text-center text-sm text-gray-500">
           <p>如有任何疑問，請聯繫我們</p>
-          <p className="mt-1">客服電話：02-1234-5678 | 服務時間：09:00-18:00</p>
-          <p className="mt-1">電子郵件：support@example.com</p>
+          <p className="mt-1">客服電話：97912581 | 服務時間：09:00-18:00</p>
+          <p className="mt-1">電子郵件：dechang1127@gmail.com</p>
         </div>
       </div>
     </div>

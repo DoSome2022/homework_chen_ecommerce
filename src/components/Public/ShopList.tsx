@@ -139,19 +139,26 @@ const matchMaterial =
   return (
     <div className="min-h-screen bg-gray-50">
 
-<header className="sticky top-0 z-20 bg-white border-b shadow-sm">
+    <header className="sticky top-0 z-20 bg-white border-b shadow-sm">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-        {/* 左側可放品牌或標題（可選） */}
-        <h2 className="text-xl font-semibold">您的商店</h2>
+        {/* 左側品牌 */}
+        <h2 className="text-xl font-semibold">德昌五金</h2>
         
-        {/* 右上登入/註冊按鈕 */}
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/login">登入</Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link href="/register">註冊</Link>
-          </Button>
+        {/* 右側：按鈕 + copyright 垂直排列 */}
+        <div className="flex flex-col items-end gap-1">
+          {/* 登入 / 註冊按鈕 */}
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/login">登入</Link>
+            </Button>
+            <Button size="sm" asChild>
+              <Link href="/register">註冊</Link>
+            </Button>
+          </div>
+    
+          {/* Copyright 放在按鈕下方，不影響 navbar 高度 */}
+          <p className="text-xs text-gray-400 mt-0.5">九龍深水埗大南街67號地下B舖</p>
+          <p className="text-xs text-gray-400">@ 2026 Tak Cheong. All rights reserved.</p>
         </div>
       </div>
     </header>

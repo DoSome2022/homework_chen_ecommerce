@@ -325,7 +325,7 @@ if (data.transferProof) {
 
 
 const calculateMemberDiscount = () => {
-  if (membershipLevel === 'FREE') return 0;
+  if (membershipLevel === 'FREE') return 1;
   
   // 會員等級對應的折扣率
   const discountRates = {
