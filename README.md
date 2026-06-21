@@ -52,3 +52,18 @@ order 有v2 (順豐做dome)
 //4-3-2026
 
 改了 上傳不到圖片 在 銀行轉帳
+
+
+
+// 21/6/2026
+拿了 後備Google login
+把admin 中的user 改了 員工 把 user.role 的user 的限制拿走全都有編輯
+在layout 拿走了會員bar
+
+修改前：
+  finalPayableAmount = (商品小計 + 運費) - DB折扣 - 會員折扣(SILVER=95折/GOLD=9折等) - 限時9折
+
+修改後：
+  finalPayableAmount = (商品小計 + 運費) - DB折扣 - 限時9折
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       不再受會員等級影響，價格純粹依商品定價

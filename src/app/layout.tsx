@@ -5,7 +5,7 @@ import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/hooks/use-cart"; // ← 關鍵 import！
-import { MembershipProvider } from "@/context/MembershipContext";
+// import { MembershipProvider } from "@/context/MembershipContext";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -25,9 +25,9 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SessionProvider>
           <CartProvider> {/* ← 包在這裡！全站都能用 useCart() */}
-            <MembershipProvider>
+            {/* <MembershipProvider> */}
               {children}
-            </MembershipProvider>
+            {/* </MembershipProvider> */}
             <Toaster />
           </CartProvider>
         </SessionProvider>

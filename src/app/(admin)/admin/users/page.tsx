@@ -308,7 +308,7 @@ export default function UsersPage() {
                     <Link href={`/admin/users/${user.id}`}>查看詳情</Link>
                   </Button>
 
-                  {user.role === 'USER' && (
+                  
                     <>
                       <Button variant="outline" size="sm" onClick={() => openEditDialog(user)}>
                         <Edit className="h-4 w-4 mr-1" /> 編輯
@@ -336,7 +336,7 @@ export default function UsersPage() {
                         </AlertDialogContent>
                       </AlertDialog>
                     </>
-                  )}
+                  
                 </div>
               </CardContent>
             </Card>

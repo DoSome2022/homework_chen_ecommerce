@@ -82,14 +82,14 @@ export default function LoginForm() {
   };
 
   // 直接跳轉的 Google 登入方法（備用）
-  const handleGoogleLoginDirect = () => {
-    setIsGoogleLoading(true);
-    setError('');
+  // const handleGoogleLoginDirect = () => {
+  //   setIsGoogleLoading(true);
+  //   setError('');
     
-    // 直接構建 Google 登入 URL
-    const googleSignInUrl = `/api/auth/signin/google?callbackUrl=${encodeURIComponent(callbackUrl)}`;
-    window.location.href = googleSignInUrl;
-  };
+  //   // 直接構建 Google 登入 URL
+  //   const googleSignInUrl = `/api/auth/signin/google?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+  //   window.location.href = googleSignInUrl;
+  // };
 
   return (
     <div className="space-y-6">
@@ -158,7 +158,7 @@ export default function LoginForm() {
         </Button>
         
         {/* 備用直接跳轉按鈕（如果上面不工作） */}
-        <Button
+        {/* <Button
           variant="ghost"
           className="w-full text-sm"
           onClick={handleGoogleLoginDirect}
@@ -166,7 +166,7 @@ export default function LoginForm() {
           type="button"
         >
           直接 Google 登入
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
