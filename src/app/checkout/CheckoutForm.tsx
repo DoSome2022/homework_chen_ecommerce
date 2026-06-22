@@ -1380,7 +1380,9 @@ export default function CheckoutForm() {
                 <Label htmlFor="pickup" className="cursor-pointer">
                   <div className="flex items-center gap-2">
                     <Store className="h-4 w-4" />
-                    <span>門市自取</span>
+                    <span>門市自取
+                      (九龍深水埗大南街67號舖地下B舖 : 德昌五金)
+                    </span>
                     <Badge variant="outline" className="ml-2">免運費</Badge>
                   </div>
                 </Label>
@@ -1812,7 +1814,7 @@ export default function CheckoutForm() {
                                 <p className="font-medium">銀行轉帳
                                   (
                                     集友銀行: 039-735-2-003237-9
-                                    德晶五金
+                                    德昌五金
                                   )
                                 </p>
                                 <p className="text-sm text-muted-foreground">轉帳後上傳證明</p>
