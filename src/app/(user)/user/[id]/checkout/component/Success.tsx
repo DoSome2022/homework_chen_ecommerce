@@ -1,4 +1,3 @@
-
 // src/app/(user)/checkout/success/SuccessClient.tsx
 "use client";
 
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { checkStripePaymentStatus } from "@/action/Order/route";
-import { Loader2, CheckCircle2, AlertCircle, CreditCard, Landmark, FileText } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, CreditCard, Landmark, FileText, Wallet } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { createOrderFromTemp } from "@/action/Order/route";
 
@@ -27,7 +26,7 @@ interface RawOrderDetails {
 interface SuccessClientProps {
   orderNumber?: string;
   userId?: string;
-  paymentMethod?: "stripe" | "bank_transfer";
+  paymentMethod?: "stripe" | "bank_transfer" | "cash";  // ✅ 加入 cash
 }
 
 interface OrderDetails {
@@ -42,22 +41,33 @@ interface OrderDetails {
 export default function SuccessClient({ 
   orderNumber, 
   userId,
+  paymentMethod: propPaymentMethod,  // ✅ 接收從父層傳入的付款方式
 }: SuccessClientProps) {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
-  const urlOrderId   = searchParams.get("orderId");
+  const urlOrderId = searchParams.get("orderId");
+  const methodFromUrl = searchParams.get("method"); // ✅ 從 URL 獲取 method
+  
   const [status, setStatus] = useState<"loading" | "success" | "failed">("loading");
   const [message, setMessage] = useState("處理中...");
   const [orderDetails, setOrderDetails] = useState<OrderDetails>({});
-  const isStripePayment = !!sessionId;
-  const actualPaymentMethod = isStripePayment ? "stripe" : "bank_transfer";
   const [hasProcessed, setHasProcessed] = useState(false);
 
-  // 轉換函數 - 使用 useCallback 優化
+  // ✅ 判斷付款方式：優先使用 prop，再來 URL 參數，最後自動判斷
+  const getPaymentMethod = useCallback(() => {
+    if (propPaymentMethod) return propPaymentMethod;
+    if (methodFromUrl === 'cash') return 'cash';
+    if (methodFromUrl === 'bank_transfer') return 'bank_transfer';
+    if (sessionId) return 'stripe';
+    return 'bank_transfer'; // 預設
+  }, [propPaymentMethod, methodFromUrl, sessionId]);
+
+  const actualPaymentMethod = getPaymentMethod();
+
+  // 轉換函數
   const convertOrderDetails = useCallback((details: RawOrderDetails | null | undefined): OrderDetails => {
     if (!details) return {};
       
-    // 處理中文屬性名
     return {
       finalTotal: details.總金額 ?? details.finalTotal,
       shippingFee: details.運費 ?? details.shippingFee,
@@ -78,20 +88,76 @@ export default function SuccessClient({
       console.log('[SuccessClient] useEffect 觸發', {
         urlOrderId,
         sessionId,
+        methodFromUrl,
+        propPaymentMethod,
+        actualPaymentMethod,
         hasSessionId: !!sessionId,
-        inferredMethod: !!sessionId ? "stripe" : "bank_transfer"
       });
 
-      // 改用 sessionId 判斷是否為 Stripe
-      if (!sessionId) {
-        // 沒有 session_id → 視為銀行轉帳或其他非 Stripe
-        console.log('[SuccessClient] 無 session_id，走非 Stripe 流程');
+      // ✅ 現金付款：直接顯示成功，不需要驗證
+      if (actualPaymentMethod === 'cash') {
+        console.log('[SuccessClient] 現金付款，直接顯示成功');
         setStatus("success");
-        setMessage("訂單已建立（非信用卡支付）");
+        setMessage("訂單已建立！請於門市取貨時支付現金。");
+        setHasProcessed(true);
+        
+        // 獲取訂單詳情
+        if (urlOrderId) {
+          try {
+            const res = await fetch(`/api/orders/${urlOrderId}/summary`);
+            if (res.ok) {
+              const data = await res.json();
+              if (data.success && data.order) {
+                setOrderDetails({
+                  finalTotal: data.order.total || data.order.finalTotal,
+                  shippingMethod: data.order.shippingMethod || undefined,
+                  shippingFee: data.order.shippingFee || 0,
+                });
+              }
+            }
+          } catch (error) {
+            console.error('獲取訂單詳情失敗:', error);
+          }
+        }
         return;
       }
 
-      // 有 session_id → Stripe 支付
+      // 銀行轉帳：直接顯示成功
+      if (actualPaymentMethod === 'bank_transfer') {
+        console.log('[SuccessClient] 銀行轉帳，直接顯示成功');
+        setStatus("success");
+        setMessage("訂單已建立！請完成銀行轉帳並上傳證明。");
+        setHasProcessed(true);
+        
+        // 獲取訂單詳情
+        if (urlOrderId) {
+          try {
+            const res = await fetch(`/api/orders/${urlOrderId}/summary`);
+            if (res.ok) {
+              const data = await res.json();
+              if (data.success && data.order) {
+                setOrderDetails({
+                  finalTotal: data.order.total || data.order.finalTotal,
+                  shippingMethod: data.order.shippingMethod || undefined,
+                  shippingFee: data.order.shippingFee || 0,
+                });
+              }
+            }
+          } catch (error) {
+            console.error('獲取訂單詳情失敗:', error);
+          }
+        }
+        return;
+      }
+
+      // Stripe 付款：需要驗證
+      if (!sessionId) {
+        console.log('[SuccessClient] 無 session_id，但也不是現金/銀行轉帳');
+        setStatus("failed");
+        setMessage("無法識別付款方式，請聯繫客服");
+        return;
+      }
+
       if (!urlOrderId) {
         console.warn('[SuccessClient] 缺少 orderId');
         setStatus("failed");
@@ -117,11 +183,10 @@ export default function SuccessClient({
           console.log('[SuccessClient] createOrderFromTemp 回傳:', orderResult);
 
           if (orderResult.success) {
-            setHasProcessed(true);  // 成功後標記已處理
+            setHasProcessed(true);
             setStatus("success");
             setMessage("付款成功！正式訂單已建立，購物車已清空");
             
-            // 使用 convertOrderDetails 處理返回的訂單詳情
             if (result.orderDetails) {
               const convertedDetails = convertOrderDetails(result.orderDetails);
               setOrderDetails(convertedDetails);
@@ -142,11 +207,11 @@ export default function SuccessClient({
     }
 
     verifyPayment();
-  }, [urlOrderId, sessionId, hasProcessed, convertOrderDetails]); // 添加 hasProcessed 和 convertOrderDetails 到依賴陣列
+  }, [urlOrderId, sessionId, hasProcessed, convertOrderDetails, actualPaymentMethod, methodFromUrl, propPaymentMethod]);
 
-  // 取得訂單詳細資訊
+  // 取得訂單詳細資訊（僅在成功時）
   useEffect(() => {
-    if (orderNumber && status === "success") {
+    if (orderNumber && status === "success" && actualPaymentMethod !== 'cash') {
       fetch(`/api/orders/${orderNumber}/summary`)
         .then(res => {
           if (!res.ok) throw new Error("API 請求失敗");
@@ -163,21 +228,33 @@ export default function SuccessClient({
         })
         .catch(error => {
           console.error("取得訂單詳細資訊失敗:", error);
-          // 可以選擇不處理，因為已有基本資訊
         });
     }
-  }, [orderNumber, status]);
+  }, [orderNumber, status, actualPaymentMethod]);
 
-  // 輔助函數：安全轉換金額顯示
+  // 輔助函數
   const formatCurrency = (amount?: number) => {
     if (amount === undefined) return "-";
     return `$${amount.toLocaleString()}`;
   };
 
-  // 輔助函數：安全顯示配送方式
   const getShippingMethodDisplay = (method?: string | null) => {
     if (!method) return "未指定";
     return method === "delivery" ? "宅配到府" : "門市自取";
+  };
+
+  // ✅ 獲取付款方式的顯示名稱和圖示
+  const getPaymentDisplay = () => {
+    switch (actualPaymentMethod) {
+      case 'stripe':
+        return { label: '信用卡 / 電子支付', icon: <CreditCard className="h-5 w-5 text-blue-600" />, color: 'blue' };
+      case 'bank_transfer':
+        return { label: '銀行轉帳', icon: <Landmark className="h-5 w-5 text-green-600" />, color: 'green' };
+      case 'cash':
+        return { label: '現金付款', icon: <Wallet className="h-5 w-5 text-amber-600" />, color: 'amber' };
+      default:
+        return { label: '未知方式', icon: null, color: 'gray' };
+    }
   };
 
   const renderContent = () => {
@@ -199,21 +276,32 @@ export default function SuccessClient({
         );
 
       case "success":
+        const paymentDisplay = getPaymentDisplay();
         return (
           <div className="space-y-8">
             {/* 成功圖標和標題 */}
             <div className="flex flex-col items-center">
               <div className="relative mb-6">
-                <div className="h-32 w-32 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle2 className="h-20 w-20 text-green-600" />
+                <div className={`h-32 w-32 rounded-full flex items-center justify-center ${
+                  actualPaymentMethod === 'cash' ? 'bg-amber-100' : 'bg-green-100'
+                }`}>
+                  {actualPaymentMethod === 'cash' ? (
+                    <Wallet className="h-20 w-20 text-amber-600" />
+                  ) : (
+                    <CheckCircle2 className="h-20 w-20 text-green-600" />
+                  )}
                 </div>
-                <Badge className="absolute -top-2 -right-2 bg-green-600 text-white text-lg py-1 px-3">
-                  成功
+                <Badge className={`absolute -top-2 -right-2 text-white text-lg py-1 px-3 ${
+                  actualPaymentMethod === 'cash' ? 'bg-amber-600' : 'bg-green-600'
+                }`}>
+                  {actualPaymentMethod === 'cash' ? '待付款' : '成功'}
                 </Badge>
               </div>
 
-              <h1 className="text-4xl font-bold text-green-700 mb-2">
-                {actualPaymentMethod === "stripe" ? "付款成功！" : "訂單建立成功！"}
+              <h1 className={`text-4xl font-bold mb-2 ${
+                actualPaymentMethod === 'cash' ? 'text-amber-700' : 'text-green-700'
+              }`}>
+                {actualPaymentMethod === 'cash' ? '訂單已建立！' : '付款成功！'}
               </h1>
               <p className="text-xl text-gray-700 mb-6">{message}</p>
             </div>
@@ -232,24 +320,17 @@ export default function SuccessClient({
                 {/* 支付方式 */}
                 <div className="flex items-center justify-between py-4 border-b">
                   <div className="flex items-center gap-2">
-                    {actualPaymentMethod === "stripe" ? (
-                      <>
-                        <CreditCard className="h-5 w-5 text-blue-600" />
-                        <span className="text-gray-600">支付方式</span>
-                      </>
-                    ) : (
-                      <>
-                        <Landmark className="h-5 w-5 text-green-600" />
-                        <span className="text-gray-600">支付方式</span>
-                      </>
-                    )}
+                    {paymentDisplay.icon}
+                    <span className="text-gray-600">支付方式</span>
                   </div>
                   <Badge variant="outline" className={
-                    actualPaymentMethod === "stripe" 
-                      ? "bg-blue-50 text-blue-700 border-blue-200" 
+                    actualPaymentMethod === 'stripe' 
+                      ? "bg-blue-50 text-blue-700 border-blue-200"
+                      : actualPaymentMethod === 'cash'
+                      ? "bg-amber-50 text-amber-700 border-amber-200"
                       : "bg-green-50 text-green-700 border-green-200"
                   }>
-                    {actualPaymentMethod === "stripe" ? "信用卡支付" : "銀行轉帳"}
+                    {paymentDisplay.label}
                   </Badge>
                 </div>
 
@@ -270,7 +351,9 @@ export default function SuccessClient({
                     )}
                     <div className="flex justify-between text-lg font-bold pt-2 border-t">
                       <span>總金額</span>
-                      <span className="text-green-700">{formatCurrency(orderDetails.finalTotal)}</span>
+                      <span className={actualPaymentMethod === 'cash' ? 'text-amber-700' : 'text-green-700'}>
+                        {formatCurrency(orderDetails.finalTotal)}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -285,12 +368,26 @@ export default function SuccessClient({
                   </div>
                 )}
 
-                {/* 交易編號（僅 Stripe） */}
-                {actualPaymentMethod === "stripe" && sessionId && (
+                {/* ✅ 現金付款專屬資訊 */}
+                {actualPaymentMethod === 'cash' && (
                   <div className="pt-4 border-t">
-                    <div className="text-sm text-gray-600 mb-1">交易編號</div>
-                    <div className="font-mono text-sm bg-gray-100 p-2 rounded-md truncate">
-                      {sessionId}
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+                        <div>
+                          <h4 className="font-medium text-amber-800 mb-2">💰 現金付款說明</h4>
+                          <ul className="text-sm text-amber-700 space-y-1">
+                            <li>• 請於門市取貨時支付現金</li>
+                            <li>• 或等待送貨員上門收款</li>
+                            <li>• 訂單已確認，我們會盡快為您處理</li>
+                            {orderDetails.shippingMethod === 'pickup' && (
+                              <li className="font-medium mt-2">
+                                📍 門市地址：九龍深水埗大南街67號舖地下B舖
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -311,6 +408,16 @@ export default function SuccessClient({
                           </ul>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 交易編號（僅 Stripe） */}
+                {actualPaymentMethod === "stripe" && sessionId && (
+                  <div className="pt-4 border-t">
+                    <div className="text-sm text-gray-600 mb-1">交易編號</div>
+                    <div className="font-mono text-sm bg-gray-100 p-2 rounded-md truncate">
+                      {sessionId}
                     </div>
                   </div>
                 )}
@@ -340,17 +447,6 @@ export default function SuccessClient({
                   繼續購物
                 </Link>
               </Button>
-
-              {/* {actualPaymentMethod === "bank_transfer" && orderNumber && userId && (
-                <Button asChild variant="secondary" size="lg" className="min-w-[200px]">
-                  <Link 
-                    href={`/user/${userId}/order/${orderNumber}/upload-proof`}
-                    className="flex items-center gap-2"
-                  >
-                    上傳轉帳證明
-                  </Link>
-                </Button>
-              )} */}
             </div>
 
             {/* 提示訊息 */}
@@ -437,7 +533,6 @@ export default function SuccessClient({
           {renderContent()}
         </div>
 
-        {/* 頁尾資訊 */}
         <div className="mt-10 text-center text-sm text-gray-500">
           <p>如有任何疑問，請聯繫我們</p>
           <p className="mt-1">客服電話：97912581 | 服務時間：09:00-18:00</p>

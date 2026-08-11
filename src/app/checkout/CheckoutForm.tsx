@@ -1084,7 +1084,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { createStripeCheckoutSession, createTempOrder } from '@/action/Order/route';
+import { createOrder, createStripeCheckoutSession, createTempOrder } from '@/action/Order/route';
 
 import { useSession } from "next-auth/react";
 
@@ -1097,11 +1097,12 @@ const checkoutSchema = z.object({
   notes: z.string().optional(),
   transferProof: z.instanceof(File).optional(),
   selectedDiscounts: z.array(z.string()).optional(),
-  paymentMethod: z.enum(['stripe', 'bank_transfer'])
+  paymentMethod: z.enum(['stripe', 'bank_transfer', 'cash'])  // ✅ 加入 cash
     .refine(val => val !== undefined, {
       message: '請選擇支付方式',
     }),
-  preferredDeliveryTime: z.enum(['全日', '上午', '下午']).optional(),
+  //  preferredDeliveryTime: z.enum(['全日', '上午', '下午']).optional().or(z.literal('')),
+preferredDeliveryTime: z.string().optional(),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -1236,6 +1237,29 @@ export default function CheckoutForm() {
     }
 
     formData.append('paymentMethod', data.paymentMethod);
+
+  // ✅ 現金付款
+  if (data.paymentMethod === 'cash') {
+    startTransition(async () => {
+      try {
+        // 直接建立正式訂單（不需要暫存）
+        const orderResult = await createOrder(formData);
+
+        if (!orderResult.success || !orderResult.orderId) {
+          toast.error(orderResult.error || '訂單建立失敗');
+          return;
+        }
+
+        // 跳轉到成功頁面，標記為現金付款
+        router.push(`/user/${userId}/checkout/success?orderId=${orderResult.orderId}&method=cash`);
+      } catch (err) {
+        console.error('現金付款流程錯誤:', err);
+        toast.error('發生錯誤，請稍後再試');
+      }
+    });
+    return; // ✅ 提前返回，避免繼續執行
+  }
+
 
     // 銀行轉帳
     if (data.paymentMethod === 'bank_transfer') {
@@ -1787,7 +1811,7 @@ export default function CheckoutForm() {
                     <RadioGroup
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                      className="grid grid-cols-1 md:grid-cols-3 gap-4"
                     >
                       <div className={`border rounded-lg p-4 cursor-pointer transition-all ${field.value === 'stripe' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
                         <div className="flex items-center space-x-3">
@@ -1823,6 +1847,24 @@ export default function CheckoutForm() {
                           </Label>
                         </div>
                       </div>
+
+          {/* ✅ 新增：現金付款 */}
+          <div className={`border rounded-lg p-4 cursor-pointer transition-all ${field.value === 'cash' ? 'border-amber-500 bg-amber-50' : 'border-gray-200 hover:border-gray-300'}`}>
+            <div className="flex items-center space-x-3">
+              <RadioGroupItem value="cash" id="cash" />
+              <Label htmlFor="cash" className="flex-1 cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <div className="h-5 w-5 text-amber-600 flex items-center justify-center text-lg">💰</div>
+                  <div>
+                    <p className="font-medium">現金付款</p>
+                    <p className="text-sm text-muted-foreground">門市付款 / 貨到付款</p>
+                  </div>
+                </div>
+              </Label>
+            </div>
+          </div>                        
+
+
                     </RadioGroup>
                   </FormControl>
                   <FormMessage />

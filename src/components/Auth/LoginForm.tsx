@@ -26,13 +26,23 @@ export default function LoginForm() {
     setIsLoading(true);
 
     try {
+
+          // ✅ 獲取用戶的 IP 和 User-Agent
+    const userAgent = navigator.userAgent;
+    
+    // 獲取 IP（需要通過 API 獲取）
+    const ipResponse = await fetch('/api/ip');
+    const ipData = await ipResponse.json();
       // 使用 redirect: false 來獲取結果
-      const result = await signIn('credentials', {
-        username,
-        password,
-        redirect: false, // 改為 false 來獲取結果
-        callbackUrl: callbackUrl,
-      });
+    const result = await signIn('credentials', {
+      username,
+      password,
+      redirect: false,
+      callbackUrl: callbackUrl,
+      // ✅ 傳遞額外資訊
+      userAgent: userAgent,
+      ipAddress: ipData.ip || '無法取得',
+    });
 
       // 檢查登入結果
       if (result?.error) {
@@ -171,3 +181,4 @@ export default function LoginForm() {
     </div>
   );
 }
+

@@ -1,16 +1,16 @@
+//src/components/Public/ShopList.tsx
 "use client";
 
 import useSWR from "swr";
 import Image from "next/image";
 import Link from "next/link";
-import { Search, Loader2, X, Heart } from "lucide-react";
+import { Search, Loader2, X, Heart, Sun, Moon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-
 import { useSWRConfig } from "swr";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -28,17 +28,13 @@ type Product = {
   materials: Material[];
 };
 
-
-
 export default function ShopProductListsPublic() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // 修正 wishlist 的資料處理
-//   const { data: wishlistData = [], error: wishlistError } = useSWR("/api/wishlist", fetcher);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-const { data: wishlistData = [] } = useSWR<Product[]>("/api/wishlist", fetcher);
-  // 確保 wishlist 是陣列
+  const { data: wishlistData = [] } = useSWR<Product[]>("/api/wishlist", fetcher);
   const wishlist = Array.isArray(wishlistData) ? wishlistData : [];
   const wishlistIds = new Set(wishlist.map((p) => p.id));
   
@@ -92,7 +88,6 @@ const { data: wishlistData = [] } = useSWR<Product[]>("/api/wishlist", fetcher);
 
   const { data: productsData = [], isLoading } = useSWR("/api/products", fetcher);
   
-  // 確保 products 是陣列
   const products = Array.isArray(productsData) ? productsData : [];
 
   const categories = products
@@ -107,9 +102,9 @@ const { data: wishlistData = [] } = useSWR<Product[]>("/api/wishlist", fetcher);
   const filteredProducts = products.filter((p) => {
     const matchSearch = p.title?.toLowerCase().includes(search.toLowerCase()) ?? true;
     const matchCategory = !selectedCategory || p.category?.id === selectedCategory;
-const matchMaterial =
-  selectedMaterials.length === 0 ||
-  p.materials.some((m: Material) => selectedMaterials.includes(m.id));
+    const matchMaterial =
+      selectedMaterials.length === 0 ||
+      p.materials.some((m: Material) => selectedMaterials.includes(m.id));
     return matchSearch && matchCategory && matchMaterial;
   });
 
@@ -128,64 +123,96 @@ const matchMaterial =
     }
   };
 
+  const toggleBackground = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-96">
-        <Loader2 className="h-12 w-12 animate-spin" />
+      <div className={`flex justify-center items-center h-96 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <Loader2 className={`h-12 w-12 animate-spin ${isDarkMode ? 'text-white' : ''}`} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen transition-colors duration-300 ${
+      isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
+    }`}>
+      <header className={`sticky top-0 z-20 border-b shadow-sm transition-colors duration-300 ${
+        isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <h2 className={`text-xl font-semibold transition-colors duration-300 ${
+            isDarkMode ? 'text-white' : ''
+          }`}>
+            德昌五金
+          </h2>
+          
+          <div className="flex flex-col items-end gap-1">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleBackground}
+                className={isDarkMode ? 'border-gray-600 text-white hover:bg-gray-700' : ''}
+              >
+                {isDarkMode ? (
+                  <Sun className="h-4 w-4 mr-2" />
+                ) : (
+                  <Moon className="h-4 w-4 mr-2" />
+                )}
+                {isDarkMode ? '淺色' : '深色'}
+              </Button>
 
-    <header className="sticky top-0 z-20 bg-white border-b shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-        {/* 左側品牌 */}
-        <h2 className="text-xl font-semibold">德昌五金</h2>
-        
-        {/* 右側：按鈕 + copyright 垂直排列 */}
-        <div className="flex flex-col items-end gap-1">
-          {/* 登入 / 註冊按鈕 */}
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/login">登入</Link>
-            </Button>
-            <Button size="sm" asChild>
-              <Link href="/register">註冊</Link>
-            </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/login">登入</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/register">註冊</Link>
+              </Button>
+            </div>
+      
+            <p className={`text-xs mt-0.5 transition-colors duration-300 ${
+              isDarkMode ? 'text-gray-400' : 'text-gray-400'
+            }`}>
+              九龍深水埗大南街67號地下B舖
+            </p>
+            <p className={`text-xs transition-colors duration-300 ${
+              isDarkMode ? 'text-gray-400' : 'text-gray-400'
+            }`}>
+              @ 2026 Tak Cheong. All rights reserved.
+            </p>
           </div>
-    
-          {/* Copyright 放在按鈕下方，不影響 navbar 高度 */}
-          <p className="text-xs text-gray-400 mt-0.5">九龍深水埗大南街67號地下B舖</p>
-          <p className="text-xs text-gray-400">@ 2026 Tak Cheong. All rights reserved.</p>
         </div>
-      </div>
-    </header>
+      </header>
 
-
-
-
-        {/* 搜尋欄 */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="relative max-w-xl">
-            <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+            <Search className={`absolute left-3 top-3 h-5 w-5 ${
+              isDarkMode ? 'text-gray-400' : 'text-gray-400'
+            }`} />
             <Input
               placeholder="搜尋商品名稱..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10"
+              className={`pl-10 transition-colors duration-300 ${
+                isDarkMode ? 'bg-gray-800 border-gray-700 text-white placeholder:text-gray-400' : ''
+              }`}
             />
           </div>
         </div>
 
         <div className="grid lg:grid-cols-4 gap-8">
-          {/* 側邊欄：分類 + 材質篩選 */}
           <div className="lg:col-span-1">
             <div className="space-y-8">
-              {/* 分類 */}
               <div>
-                <h3 className="font-semibold mb-4">商品分類</h3>
+                <h3 className={`font-semibold mb-4 transition-colors duration-300 ${
+                  isDarkMode ? 'text-white' : ''
+                }`}>
+                  商品分類
+                </h3>
                 <div className="space-y-2">
                   <Button
                     variant={selectedCategory ? "outline" : "default"}
@@ -207,9 +234,12 @@ const matchMaterial =
                 </div>
               </div>
 
-              {/* 材質 */}
               <div>
-                <h3 className="font-semibold mb-4">材質</h3>
+                <h3 className={`font-semibold mb-4 transition-colors duration-300 ${
+                  isDarkMode ? 'text-white' : ''
+                }`}>
+                  材質
+                </h3>
                 <div className="space-y-2">
                   {materials.map((m) => (
                     <Button
@@ -228,10 +258,13 @@ const matchMaterial =
                 </div>
               </div>
 
-              {/* 目前篩選條件 */}
               {(selectedCategory || selectedMaterials.length > 0) && (
                 <div>
-                  <h3 className="font-semibold mb-4">已選條件</h3>
+                  <h3 className={`font-semibold mb-4 transition-colors duration-300 ${
+                    isDarkMode ? 'text-white' : ''
+                  }`}>
+                    已選條件
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     {selectedCategory && (
                       <Badge variant="secondary">
@@ -260,11 +293,14 @@ const matchMaterial =
             </div>
           </div>
 
-          {/* 主內容：商品格線 */}
           <div className="lg:col-span-3">
             {filteredProducts.length === 0 ? (
               <div className="text-center py-24">
-                <p className="text-xl text-gray-500">找不到符合條件的商品</p>
+                <p className={`text-xl transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  找不到符合條件的商品
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -272,16 +308,17 @@ const matchMaterial =
                   <Link
                     href={`/`}
                     key={product.id}
-                    className="group relative" // 加入 relative 供絕對定位使用
+                    className="group relative"
                   >
-                    {/* Hover 提示框 */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                       <div className="bg-black/75 text-white px-4 py-2 rounded-lg text-sm font-medium backdrop-blur-sm">
                         請登入才可以買
                       </div>
                     </div>
 
-                    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+                    <Card className={`overflow-hidden hover:shadow-xl transition-all duration-300 h-full flex flex-col ${
+                      isDarkMode ? 'bg-gray-800 border-gray-700' : ''
+                    }`}>
                       <div className="aspect-square relative bg-gray-100">
                         {product.img ? (
                           <Image
@@ -299,19 +336,26 @@ const matchMaterial =
                       </div>
 
                       <CardHeader className="pb-3">
-                        <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
+                        <CardTitle className={`text-lg line-clamp-2 group-hover:text-primary transition-colors ${
+                          isDarkMode ? 'text-white' : ''
+                        }`}>
                           {product.title || "無標題商品"}
                         </CardTitle>
                       </CardHeader>
 
                       <CardContent className="flex-1 flex flex-col justify-between">
                         <div className="space-y-3">
-                          <p className="text-2xl font-bold text-primary">
+                          {/* ✅ 修改：價格文字在深色模式變白色 */}
+                          <p className={`text-2xl font-bold transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-primary'
+                          }`}>
                             ${product.price || "0"}
                           </p>
 
                           {product.unit.length > 0 && (
-                            <p className="text-sm text-gray-600">
+                            <p className={`text-sm transition-colors duration-300 ${
+                              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
                               單位：{product.unit.join(" / ")}
                             </p>
                           )}
@@ -322,15 +366,15 @@ const matchMaterial =
                             </Badge>
                           )}
 
-                            {product.materials.length > 0 && (
+                          {product.materials.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-2">
-                                {product.materials.map((m: Material) => (
+                              {product.materials.map((m: Material) => (
                                 <Badge key={m.id} variant="outline" className="text-xs">
-                                    {m.materials}
+                                  {m.materials}
                                 </Badge>
-                                ))}
+                              ))}
                             </div>
-                            )}
+                          )}
                         </div>
 
                         <Button
@@ -357,6 +401,6 @@ const matchMaterial =
           </div>
         </div>
       </div>
-    
+    </div>
   );
 }

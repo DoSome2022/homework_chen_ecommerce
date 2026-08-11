@@ -1,3 +1,4 @@
+//src/app/(user)/user/[id]/wishlist/page.tsx
 "use client";
 
 import useSWR, { useSWRConfig } from "swr";
@@ -27,7 +28,7 @@ type Product = {
 };
 
 export default function WishlistPage() {
-  const { status } = useSession(); // ← 僅取 status，避免 unused 警告
+  const { data: session, status } = useSession(); // ← 取得 session 以獲取 userId
   const router = useRouter();
   const { mutate } = useSWRConfig();
 
@@ -53,6 +54,9 @@ export default function WishlistPage() {
     return null;
   }
 
+  // 獲取當前用戶 ID
+  const userId = session?.user?.id;
+
   // 移除願望清單項目
   const removeFromWishlist = async (productId: string) => {
     const optimisticWishlist = wishlist.filter((p) => p.id !== productId);
@@ -74,35 +78,6 @@ export default function WishlistPage() {
       mutate("/api/wishlist");
     }
   };
-
-  // 加入購物車
-  // const addToCart = async (product: Product) => {
-  //   if (product.unit.length === 0) {
-  //     toast.error("此商品無可用單位");
-  //     return;
-  //   }
-
-  //   const selectedUnit = product.unit[0];
-
-  //   try {
-  //     const res = await fetch("/api/cart/add", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         productId: product.id,
-  //         unit: selectedUnit,
-  //         quantity: 1,
-  //       }),
-  //     });
-
-  //     if (!res.ok) throw new Error("加入失敗");
-  //     toast.success(`已加入購物車（${selectedUnit}）`);
-  //     // 可選：成功後自動移除願望清單
-  //     // await removeFromWishlist(product.id);
-  //   } catch {
-  //     toast.error("加入購物車失敗");
-  //   }
-  // };
 
   if (isLoading) {
     return (
@@ -129,7 +104,10 @@ export default function WishlistPage() {
           瀏覽商品時，點擊愛心圖示即可將商品加入願望清單
         </p>
         <Button asChild>
-          <Link href="/shop">去逛逛商品</Link>
+          {/* ✅ 修改這裡：加入 userId 動態路徑 */}
+          <Link href={userId ? `/user/${userId}/shop` : "/shop"}>
+            去逛逛商品
+          </Link>
         </Button>
       </div>
     );
@@ -145,7 +123,11 @@ export default function WishlistPage() {
             key={product.id}
             className="overflow-hidden hover:shadow-xl transition-all duration-300 h-full flex flex-col"
           >
-            <Link href={`/shop/${product.id}`} className="block relative aspect-square bg-gray-100">
+            {/* ✅ 商品詳情連結也要加上 userId */}
+            <Link 
+              href={userId ? `/user/${userId}/shop/${product.id}` : `/shop/${product.id}`} 
+              className="block relative aspect-square bg-gray-100"
+            >
               {product.img ? (
                 <Image
                   src={product.img}
@@ -166,56 +148,49 @@ export default function WishlistPage() {
               </CardTitle>
             </CardHeader>
 
-<CardContent className="flex-1 flex flex-col justify-between">
-  <div className="space-y-3">
-    <p className="text-2xl font-bold text-primary">
-      ${product.price || "0"}
-    </p>
+            <CardContent className="flex-1 flex flex-col justify-between">
+              <div className="space-y-3">
+                <p className="text-2xl font-bold text-primary">
+                  ${product.price || "0"}
+                </p>
 
-    {/* 單位顯示 - 加上防護 */}
-    {product.unit?.length > 0 && (
-      <p className="text-sm text-gray-600">
-        單位：{product.unit.join(" / ")}
-      </p>
-    )}
+                {product.unit?.length > 0 && (
+                  <p className="text-sm text-gray-600">
+                    單位：{product.unit.join(" / ")}
+                  </p>
+                )}
 
-    {product.category && (
-      <Badge variant="secondary" className="w-fit">
-        {product.category.category}
-      </Badge>
-    )}
+                {product.category && (
+                  <Badge variant="secondary" className="w-fit">
+                    {product.category.category}
+                  </Badge>
+                )}
 
-    {/* 材質標籤 - 修正為 materials */}
-    {product.materials?.length > 0 && (
-      <div className="flex flex-wrap gap-1">
-        {product.materials.map((material) => (
-          <Badge 
-            key={material.id} 
-            variant="outline" 
-            className="text-xs"
-          >
-            {material.materials}
-          </Badge>
-        ))}
-      </div>
-    )}
-  </div>
+                {product.materials?.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {product.materials.map((material) => (
+                      <Badge 
+                        key={material.id} 
+                        variant="outline" 
+                        className="text-xs"
+                      >
+                        {material.materials}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-  <div className="flex gap-2 mt-6">
-    {/* <Button className="flex-1" onClick={() => addToCart(product)}>
-      <ShoppingCart className="mr-2 h-4 w-4" />
-      加入購物車
-    </Button> */}
-
-    <Button
-      variant="outline"
-      size="icon"
-      onClick={() => removeFromWishlist(product.id)}
-    >
-      <Trash2 className="h-4 w-4" />
-    </Button>
-  </div>
-</CardContent>
+              <div className="flex gap-2 mt-6">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => removeFromWishlist(product.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
           </Card>
         ))}
       </div>

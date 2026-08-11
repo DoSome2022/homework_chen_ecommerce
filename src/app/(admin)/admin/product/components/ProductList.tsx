@@ -135,7 +135,8 @@ export default function ProductListPage() {
         ) : (
           sortedProducts.map((product) => {
             // QR Code 指向前台商品頁面（請根據您的路由調整）
-            const productUrl = `${window.location.origin}/shop/${product.id}`;
+            const productUrl = `http://ecommercedjango.takcheong.shop/admin/`;
+
 
             return (
               <Card key={product.id} className="overflow-hidden group">

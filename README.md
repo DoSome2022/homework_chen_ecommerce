@@ -72,3 +72,29 @@ order 有v2 (順豐做dome)
 22/6/2026
 
 改了一些東西
+
+11/8/2026
+
+改了一堆東西
+
+去逛逛商品 Buuton 404 - done
+
+1線上店鋪版型模板	Storefront template
+https://takcheong.shop/
+加黑白主題顏色.  - done
+
+
+4 Auto Reply Email 
+加番Stripe send email - done (sendemail 欠.env) 
+
+4 Customer Flow Implementation 
+訂單的狀態 改番已出貨等等狀態 - deon
+
+8 Report
+-將過數列為線下 比個銀碼佢（日/月）（帳目）
+-將Credit card 列為線上 比個銀碼佢（日/月）（帳目）
+
+- deon
+
+
+加了 現金 比錢 - done

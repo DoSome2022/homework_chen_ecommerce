@@ -1,3 +1,4 @@
+//src/app/(admin)/admin/accountant/page.tsx
 
 import { redirect } from "next/navigation";
 

@@ -1,6 +1,11 @@
 // src/action/Order/route.ts
 'use server';
 
+
+
+
+
+
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import Stripe from 'stripe';
@@ -8,9 +13,8 @@ import { db } from '@/lib/db';
 import { calculateDiscountedTotal } from '@/lib/discount';
 import { auth } from '../../../auth';
 import { Discount } from '@prisma/client';
-import { ReturnStatus } from "@prisma/client";  // ← 加入這行
+import { ReturnStatus } from "@prisma/client";
 import OSS from "ali-oss";
-
 
 const ossClient = new OSS({
   region: process.env.OSS_REGION!,
@@ -19,6 +23,7 @@ const ossClient = new OSS({
   bucket: process.env.OSS_BUCKET!,
 });
 
+// ✅ 修改：preferredDeliveryTime 改為 string optional
 const checkoutSchema = z.object({
   shippingName: z.string().min(1, '請填寫收件人姓名'),
   shippingPhone: z.string().min(8, '請填寫正確手機號碼'),
@@ -28,11 +33,10 @@ const checkoutSchema = z.object({
   shippingFee: z.coerce.number(),
   notes: z.string().optional(),
   transferProofImg: z.string().optional(),
-  finalTotal: z.string().optional(), // ✅ 添加這個欄位
-preferredDeliveryTime: z.enum(['全日', '上午', '下午']).optional(),
+  finalTotal: z.string().optional(),
+  preferredDeliveryTime: z.string().optional(), // ✅ 改為 string
+  paymentMethod: z.enum(['stripe', 'bank_transfer', 'cash']).optional(),
 });
-
-
 
 export async function createOrder(formData: FormData) {
   console.log('[createOrder] 開始執行');
@@ -50,6 +54,9 @@ export async function createOrder(formData: FormData) {
   const rawData = Object.fromEntries(formData);
   console.log('[createOrder] 收到的 FormData:', rawData);
 
+  // ✅ 取得付款方式
+  const paymentMethod = rawData.paymentMethod as string;
+
   // 處理折扣
   const selectedDiscountsStr = formData.get('selectedDiscounts') as string;
   let selectedDiscountIds: string[] = [];
@@ -63,7 +70,6 @@ export async function createOrder(formData: FormData) {
     }
   }
 
-  // ✅ 取得前端計算的折扣後總額
   const finalPayableAmountStr = formData.get('finalTotal') as string;
   let finalPayableAmount: number | null = null;
   
@@ -123,7 +129,7 @@ export async function createOrder(formData: FormData) {
     }
   }
 
-  // 5. 計算總額（用於驗證和記錄）
+  // 5. 計算總額
   let calculatedTotal: number;
   let appliedDiscounts: string[] = [];
   let shippingFee: number;
@@ -147,20 +153,6 @@ export async function createOrder(formData: FormData) {
     return { success: false, error: '計算折扣時發生錯誤' };
   }
 
-  // ✅ 驗證前端傳入的金額與後端計算是否一致（允許小誤差）
-  if (finalPayableAmount !== null) {
-    const difference = Math.abs(finalPayableAmount - calculatedTotal);
-    if (difference > 1) { // 允許 1 元以內的誤差
-      console.warn('[createOrder] 金額不一致:', {
-        前端傳入: finalPayableAmount,
-        後端計算: calculatedTotal,
-        差異: difference
-      });
-      // 可以選擇記錄或警告，但繼續使用前端金額
-    }
-  }
-
-  // ✅ 決定要使用的總額（優先使用前端傳入的折扣後金額）
   const orderTotal = finalPayableAmount !== null ? finalPayableAmount : calculatedTotal;
   console.log('[createOrder] 最終訂單總額:', orderTotal);
 
@@ -174,24 +166,42 @@ export async function createOrder(formData: FormData) {
         `運費：${data.shippingFee}`,
         finalPayableAmount !== null ? `前端折扣後金額：$${finalPayableAmount}` : null,
         `後端計算金額：$${calculatedTotal}`,
+        `付款方式：${paymentMethod === 'cash' ? '現金付款' : paymentMethod === 'bank_transfer' ? '銀行轉帳' : 'Stripe'}`,
       ].filter(Boolean).join('\n');
 
-      // ✅ 建立訂單，使用折扣後的金額
+      // 根據付款方式設定訂單狀態
+      let orderStatus = 'pending_payment';
+      let paymentStatus = 'pending';
+      let paidAt = null;
+
+      if (paymentMethod === 'cash') {
+        orderStatus = 'paid';
+        paymentStatus = 'succeeded';
+        paidAt = new Date();
+      } else if (paymentMethod === 'bank_transfer') {
+        orderStatus = 'pending_payment';
+        paymentStatus = 'pending';
+      } else if (paymentMethod === 'stripe') {
+        orderStatus = 'pending_payment';
+        paymentStatus = 'pending';
+      }
+
       const createdOrder = await tx.order.create({
         data: {
           userId,
-          total: orderTotal, // ✅ 使用折扣後的金額
-          status: 'pending_payment',
+          total: orderTotal,
+          status: orderStatus,
           shippingName: data.shippingName,
           shippingPhone: data.shippingPhone,
           shippingAddress: data.shippingAddress,
           shippingMethod: data.shippingMethod,
-          paymentStatus: 'pending',
-          paymentMethod: null,
+          paymentMethod: paymentMethod,
+          paymentStatus: paymentStatus,
           preferredDeliveryTime: data.preferredDeliveryTime || null,
-          shippingFee: shippingFee, // ✅ 使用計算的運費
+          shippingFee: shippingFee,
           notes: combinedNotes,
           transferProofImg: data.transferProofImg || null,
+          paidAt: paidAt,
           items: {
             create: cart.items.map((item) => ({
               productId: item.productId,
@@ -218,20 +228,24 @@ export async function createOrder(formData: FormData) {
     console.log('[createOrder] 訂單建立成功:', {
       orderId: order.id,
       orderNumber: order.orderNumber,
-      total: order.total, // 折扣後的金額
+      total: order.total,
+      paymentMethod: order.paymentMethod,
+      status: order.status,
     });
 
     return {
       success: true,
       orderId: order.id,
       orderNumber: order.orderNumber,
-      total: order.total, // ✅ 返回折扣後的金額
+      total: order.total,
     };
   } catch (e) {
     console.error('[createOrder] 事務執行失敗:', e);
     return { success: false, error: '建立訂單失敗，請稍後再試' };
   }
 }
+
+// ... 其餘函式保持不變
 
 // 其餘動作函式（updateTrackingNumberAction、settleOrderToAccountAction 等）保持不變
 // ...（請保留您檔案中其餘的 export async function）

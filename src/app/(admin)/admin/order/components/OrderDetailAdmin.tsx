@@ -1,4 +1,5 @@
 // src/app/(admin)/admin/orders/[orderId]/components/OrderDetailAdmin.tsx
+
 "use client";
 
 import useSWR from "swr";
@@ -78,12 +79,30 @@ interface UpdateData {
   status?: string;
   trackingNumber?: string | null;
   notes?: string;
-  // 可以根據需要添加其他可更新字段
   shippingAddress?: string;
   shippingName?: string;
   shippingPhone?: string;
   preferredDeliveryTime?: string | null;
 }
+
+// ✅ 新增：訂單狀態對應函數
+const getStatusBadge = (status: string) => {
+  const statusMap: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+    pending: { label: "待處理", variant: "secondary" },
+    pending_payment: { label: "待付款", variant: "secondary" },
+    paid: { label: "已付款", variant: "default" },
+    processing: { label: "處理中", variant: "default" },
+    shipped: { label: "已出貨", variant: "default" },
+    completed: { label: "已完成", variant: "default" },
+    cancelled: { label: "已取消", variant: "destructive" },
+    return_requested: { label: "退貨申請中", variant: "destructive" },
+    return_approved: { label: "退貨已批准", variant: "default" },
+    return_rejected: { label: "退貨已拒絕", variant: "destructive" },
+    return_refunded: { label: "已退款", variant: "outline" },
+  };
+
+  return statusMap[status] || { label: status, variant: "default" };
+};
 
 export default function OrderDetailAdmin({ orderId }: { orderId: string }) {
   const [trackingNumber, setTrackingNumber] = useState("");
@@ -217,6 +236,9 @@ export default function OrderDetailAdmin({ orderId }: { orderId: string }) {
   if (!order) {
     return <div className="text-center py-24 text-xl">訂單不存在</div>;
   }
+
+  // ✅ 獲取狀態對應資訊
+  const statusInfo = getStatusBadge(order.status);
 
   return (
     <div ref={contentRef} className="max-w-5xl mx-auto py-12">
@@ -435,22 +457,6 @@ export default function OrderDetailAdmin({ orderId }: { orderId: string }) {
 
         {/* 右側：訂單摘要 + 退貨處理 */}
         <div className="space-y-6">
-          {order.transferProofImg && (
-  <Card>
-    <CardHeader>
-      <CardTitle>轉帳證明</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <Image
-        src={order.transferProofImg}
-        alt="轉帳證明"
-        width={300}
-        height={300}
-        className="mt-2 rounded-lg object-cover border"
-      />
-    </CardContent>
-  </Card>
-)}
           <Card className="sticky top-6">
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
@@ -470,7 +476,7 @@ export default function OrderDetailAdmin({ orderId }: { orderId: string }) {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* 狀態 */}
+              {/* ✅ 修改：狀態顯示 */}
               <div>
                 <Label>訂單狀態</Label>
                 {isEditing ? (
@@ -480,16 +486,23 @@ export default function OrderDetailAdmin({ orderId }: { orderId: string }) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="pending">待處理</SelectItem>
+                      <SelectItem value="pending_payment">待付款</SelectItem>
                       <SelectItem value="paid">已付款</SelectItem>
+                      <SelectItem value="processing">處理中</SelectItem>
                       <SelectItem value="shipped">已出貨</SelectItem>
                       <SelectItem value="completed">已完成</SelectItem>
                       <SelectItem value="cancelled">已取消</SelectItem>
+                      <SelectItem value="return_requested">退貨申請中</SelectItem>
+                      <SelectItem value="return_approved">退貨已批准</SelectItem>
+                      <SelectItem value="return_rejected">退貨已拒絕</SelectItem>
+                      <SelectItem value="return_refunded">已退款</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
                   <div className="mt-1">
-                    <Badge variant={order.status === "pending" ? "secondary" : "default"} className="text-lg px-6 py-2">
-                      {order.status === "pending" ? "待處理" : "已完成"}
+                    {/* ✅ 使用 getStatusBadge 函數顯示正確的狀態 */}
+                    <Badge variant={statusInfo.variant} className="text-lg px-6 py-2">
+                      {statusInfo.label}
                     </Badge>
                   </div>
                 )}
