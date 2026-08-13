@@ -21,6 +21,7 @@ const createUserSchema = z.object({
 // Zod Schema：更新用戶（密碼可選）
 const updateUserSchema = createUserSchema.partial().extend({
   password: z.string().min(6).optional().or(z.literal('')),
+  currentMembershipLevel: z.enum(['FREE', 'SILVER', 'GOLD', 'PLATINUM']).optional(),
 });
 
 export async function createUserAction(formData: FormData) {
@@ -70,7 +71,6 @@ export async function updateUserAction(userId: string, formData: FormData) {
     return { success: false, error: '未授權' };
   }
 
-  // 禁止修改 ADMIN 帳號
   const targetUser = await db.user.findUnique({ where: { id: userId } });
   if (!targetUser || targetUser.role === 'ADMIN') {
     return { success: false, error: '無法修改 ADMIN 或用戶不存在' };
@@ -83,7 +83,7 @@ export async function updateUserAction(userId: string, formData: FormData) {
     return { success: false, errors: validated.error.flatten().fieldErrors };
   }
 
-  const { username, email, phone, password, name } = validated.data;
+  const { username, email, phone, password, name, currentMembershipLevel } = validated.data;
 
   // 檢查重複（排除自己）
   const existing = await db.user.findFirst({
@@ -97,21 +97,44 @@ export async function updateUserAction(userId: string, formData: FormData) {
     return { success: false, error: '使用者名稱或 Email 已存在' };
   }
 
-  await db.user.update({
-    where: { id: userId },
-    data: {
-      username,
-      email: email || null,
-      phone: phone || null,
-      name: name || null,
-      ...(password ? { passwordHash: await bcrypt.hash(password, 10) } : {}),
-    },
+  await db.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: userId },
+      data: {
+        username,
+        email: email || null,
+        phone: phone || null,
+        name: name || null,
+        ...(password ? { passwordHash: await bcrypt.hash(password, 10) } : {}),
+        // 同步更新 User 的目前等級
+        ...(currentMembershipLevel ? { currentMembershipLevel } : {}),
+      },
+    });
+
+    // 同步建立或更新 UserMembership
+    if (currentMembershipLevel) {
+      await tx.userMembership.upsert({
+        where: { userId },
+        update: {
+          tierLevel: currentMembershipLevel,
+          status: 'active',
+        },
+        create: {
+          userId,
+          tierLevel: currentMembershipLevel,
+          startsAt: new Date(),
+          autoRenew: true,
+          status: 'active',
+        },
+      });
+    }
   });
 
   revalidatePath('/admin/users');
   revalidatePath(`/admin/users/${userId}`);
   return { success: true, message: '用戶更新成功' };
 }
+
 
 export async function deleteUserAction(userId: string) {
   const session = await auth();

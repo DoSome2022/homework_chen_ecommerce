@@ -55,10 +55,44 @@ export async function createCategoriesAction(
 }
 
 
+// src/action/Category/route.ts （加入編輯功能）
+
+const categoryNameSchema = z.object({
+  category: z.string().min(1, "請輸入類別名稱").trim(),
+});
+
+export async function updateCategoryAction(
+  id: string,
+  category: string
+): Promise<ActionResult> {
+  const parsed = categoryNameSchema.safeParse({ category });
+
+  if (!parsed.success) {
+    return { error: parsed.error.flatten().formErrors[0] || "請輸入類別名稱" };
+  }
+
+  try {
+    // 與 create 保持一致，統一轉成大寫
+    await db.category.update({
+      where: { id },
+      data: { category: parsed.data.category.toUpperCase() },
+    });
+
+    revalidatePath("/admin/category");
+    revalidatePath("/api/category");
+
+    return { success: true };
+  } catch (err) {
+    console.error("更新類別失敗:", err);
+    return { error: "更新失敗，可能類別名稱重複" };
+  }
+}
+
+
 // src/action/Category/route.ts（加上刪除功能）
 
 
-// src/action/Category/route.ts
+
 
 
 // 定義正確的回傳型別

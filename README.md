@@ -98,3 +98,9 @@ https://takcheong.shop/
 
 
 加了 現金 比錢 - done
+
+
+
+13/8/2026
+
+只加了會員相關的東西，未測試 先git

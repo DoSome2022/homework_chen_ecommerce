@@ -11,6 +11,8 @@ import { useState } from 'react';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
+type MembershipLevel = 'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM';
+
 type UserDetail = {
   id: string;
   username: string;
@@ -18,6 +20,20 @@ type UserDetail = {
   email: string | null;
   phone: string | null;
   role: 'ADMIN' | 'USER';
+  currentMembershipLevel: MembershipLevel; // ← 新增
+  membership?: {
+    tierLevel: MembershipLevel;
+    status: string;
+    startsAt: string | null;
+    endsAt: string | null;
+    autoRenew: boolean;
+    tier?: {
+      name: string;
+      color: string | null;
+      benefits: string[];
+      price: number;
+    } | null;
+  } | null; // ← 新增
   createdAt: string;
   updatedAt: string;
   Order: Array<{
@@ -30,6 +46,25 @@ type UserDetail = {
     shippingAddress: string;
   }>;
 };
+
+// 會員等級顏色與顯示名稱（無資料時 fallback 免費會員）
+const membershipColors: Record<MembershipLevel, string> = {
+  FREE: 'bg-gray-100 text-gray-700',
+  SILVER: 'bg-gray-200 text-gray-700',
+  GOLD: 'bg-yellow-100 text-yellow-800',
+  PLATINUM: 'bg-purple-100 text-purple-800',
+};
+
+function MembershipInfo({ user }: { user: UserDetail }) {
+  const level = user.membership?.tierLevel ?? user.currentMembershipLevel ?? 'FREE';
+  const displayName = user.membership?.tier?.name ?? level;
+
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium ${membershipColors[level]}`}>
+      {displayName}
+    </span>
+  );
+}
 
 type SortKey = 'createdAt' | 'total';
 type SortOrder = 'asc' | 'desc';
@@ -81,11 +116,21 @@ export default function UserDetailPage() {
           <p>Email：{user.email || '無'}</p>
           <p>電話：{user.phone || '無'}</p>
           <p>角色：{user.role}</p>
+          <p className="flex items-center gap-2">
+            會員等級：
+            <MembershipInfo user={user} />
+          </p>
+          {user.membership?.endsAt && (
+            <p className="text-sm text-gray-500">
+              會員到期：{new Date(user.membership.endsAt).toLocaleDateString()}
+            </p>
+          )}
           <p>建立時間：{new Date(user.createdAt).toLocaleString()}</p>
           <p>更新時間：{new Date(user.updatedAt).toLocaleString()}</p>
         </CardContent>
       </Card>
 
+      {/* 訂單 Card 維持不變 */}
       <Card>
         <CardHeader>
           <CardTitle className="flex justify-between items-center">

@@ -1,0 +1,158 @@
+[
+  {
+    "id": "83fac669-ffdd-450c-bcea-7a168cb82f0c",
+    "materials": "膠",
+    "createdAt": "2026-01-19T05:17:22.152Z",
+    "updatedAt": "2026-01-19T05:17:22.152Z"
+  },
+  {
+    "id": "900219d9-8ddf-4ab7-a452-1f0d23bc2c00",
+    "materials": "鐵",
+    "createdAt": "2026-01-19T05:17:25.624Z",
+    "updatedAt": "2026-01-19T05:17:25.624Z"
+  },
+  {
+    "id": "625fa4c2-ca3f-4f16-8eac-5acaff666b93",
+    "materials": "銅",
+    "createdAt": "2026-01-19T05:17:33.984Z",
+    "updatedAt": "2026-01-19T05:17:33.984Z"
+  },
+  {
+    "id": "ee66a176-9309-4931-bda1-9ad82e8006fd",
+    "materials": "木",
+    "createdAt": "2026-01-19T05:17:36.486Z",
+    "updatedAt": "2026-01-19T05:17:36.486Z"
+  },
+  {
+    "id": "20e32374-f3a4-45e8-a795-4f34954fa567",
+    "materials": "304不鏽鋼",
+    "createdAt": "2026-02-04T10:38:01.967Z",
+    "updatedAt": "2026-02-04T10:38:01.967Z"
+  },
+  {
+    "id": "3c16bbaa-a69d-4467-9716-26257dcf7b61",
+    "materials": "高碳鋼頭",
+    "createdAt": "2026-02-04T10:38:07.255Z",
+    "updatedAt": "2026-02-04T10:38:07.255Z"
+  },
+  {
+    "id": "4245cd75-9f91-48de-bb62-d98acdc4d472",
+    "materials": "玻璃纖維柄",
+    "createdAt": "2026-02-04T10:38:09.931Z",
+    "updatedAt": "2026-02-04T10:38:09.931Z"
+  },
+  {
+    "id": "9e3cae5a-4f03-4557-9687-b3a5502457f0",
+    "materials": "鉻釩鋼批頭",
+    "createdAt": "2026-02-04T10:38:12.939Z",
+    "updatedAt": "2026-02-04T10:38:12.939Z"
+  },
+  {
+    "id": "ba3b33f1-70bf-468c-887c-eb4cfe6d7eba",
+    "materials": "TPR手柄",
+    "createdAt": "2026-02-04T10:38:15.533Z",
+    "updatedAt": "2026-02-04T10:38:15.533Z"
+  },
+  {
+    "id": "c564bdc3-a7ca-4edf-86aa-6eeb8a66a015",
+    "materials": "鉻釩鋼",
+    "createdAt": "2026-02-04T10:38:19.718Z",
+    "updatedAt": "2026-02-04T10:38:19.718Z"
+  },
+  {
+    "id": "4656bb5a-8dcc-42c6-bfb2-170514312af4",
+    "materials": "PVC絕緣",
+    "createdAt": "2026-02-04T10:38:26.092Z",
+    "updatedAt": "2026-02-04T10:38:26.092Z"
+  },
+  {
+    "id": "ac91f3b6-e769-426a-9348-d1aa41b5d512",
+    "materials": "塑料",
+    "createdAt": "2026-02-04T10:38:40.336Z",
+    "updatedAt": "2026-02-04T10:38:40.336Z"
+  },
+  {
+    "id": "b2118f96-8c72-4689-8b79-2cc64d19adba",
+    "materials": "金屬",
+    "createdAt": "2026-02-04T10:38:42.899Z",
+    "updatedAt": "2026-02-04T10:38:42.899Z"
+  },
+  {
+    "id": "6c8eb820-cb77-4338-a13f-e9a5c1ef68a0",
+    "materials": "紫銅",
+    "createdAt": "2026-02-04T10:38:46.099Z",
+    "updatedAt": "2026-02-04T10:38:46.099Z"
+  },
+  {
+    "id": "6aceab3c-4933-4195-b782-1f175988adc8",
+    "materials": "PVC-U",
+    "createdAt": "2026-02-04T10:38:49.508Z",
+    "updatedAt": "2026-02-04T10:38:49.508Z"
+  },
+  {
+    "id": "21acf49c-da8e-47b8-9685-0b96fc0c38f6",
+    "materials": "低碳鋼",
+    "createdAt": "2026-02-04T10:38:53.239Z",
+    "updatedAt": "2026-02-04T10:38:53.239Z"
+  },
+  {
+    "id": "f4145a2e-1a0b-4c18-920a-f941353c1adf",
+    "materials": "鋅層",
+    "createdAt": "2026-02-04T10:38:55.584Z",
+    "updatedAt": "2026-02-04T10:38:55.584Z"
+  },
+  {
+    "id": "b0132886-5961-419f-b70d-b0ffe57e605e",
+    "materials": "滌綸",
+    "createdAt": "2026-02-04T10:39:00.279Z",
+    "updatedAt": "2026-02-04T10:39:00.279Z"
+  },
+  {
+    "id": "e0d08ac2-c32c-48f3-9e19-b700ee54470f",
+    "materials": "膠塗層",
+    "createdAt": "2026-02-04T10:39:04.114Z",
+    "updatedAt": "2026-02-04T10:39:04.114Z"
+  },
+  {
+    "id": "da0b7fc3-a220-4c73-b4c1-a62db4dabe61",
+    "materials": "PET",
+    "createdAt": "2026-02-04T10:39:08.112Z",
+    "updatedAt": "2026-02-04T10:39:08.112Z"
+  },
+  {
+    "id": "6f9920e0-bfc4-4875-afef-e6c93dbd2cae",
+    "materials": "超細纖維",
+    "createdAt": "2026-02-04T10:39:11.549Z",
+    "updatedAt": "2026-02-04T10:39:11.549Z"
+  },
+  {
+    "id": "dd01d768-48c0-4e51-a8fe-51ecb9d6c64e",
+    "materials": "鋁合金桿",
+    "createdAt": "2026-02-04T10:39:17.507Z",
+    "updatedAt": "2026-02-04T10:39:17.507Z"
+  },
+  {
+    "id": "7e61b7ba-8958-427e-90f8-c11b403a942a",
+    "materials": "丙烯酸乳液",
+    "createdAt": "2026-02-04T10:39:22.560Z",
+    "updatedAt": "2026-02-04T10:39:22.560Z"
+  },
+  {
+    "id": "7ed8841c-cb80-487b-b46a-e1ea02fadebd",
+    "materials": "鈦白粉",
+    "createdAt": "2026-02-04T10:39:25.218Z",
+    "updatedAt": "2026-02-04T10:39:25.218Z"
+  },
+  {
+    "id": "ea3488e3-f212-43ac-9cb8-2beae31e61ad",
+    "materials": "純丙乳液",
+    "createdAt": "2026-02-04T10:39:31.159Z",
+    "updatedAt": "2026-02-04T10:39:31.159Z"
+  },
+  {
+    "id": "3d6e613c-1aa4-4549-933e-4909b1bdbd6b",
+    "materials": "耐候顏料",
+    "createdAt": "2026-02-04T10:39:34.802Z",
+    "updatedAt": "2026-02-04T10:39:34.802Z"
+  }
+]

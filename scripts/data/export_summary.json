@@ -1,0 +1,64 @@
+{
+  "exportDate": "2026-08-12T02:16:54.291Z",
+  "counts": {
+    "users": 17,
+    "products": 33,
+    "categories": 7,
+    "materials": 26,
+    "units": 8
+  },
+  "sampleUsers": [
+    {
+      "id": "965dcc76-6ddc-4ac0-8089-d8a0413b1290",
+      "username": "hangstech20000101_google",
+      "name": "hangs"
+    },
+    {
+      "id": "c6652df9-0c6b-4478-947c-98645ea55cd2",
+      "username": "johnnyleecheukyan_google",
+      "name": "Johnny Lee"
+    },
+    {
+      "id": "6fa91b10-b75c-4f14-8d80-438a6def4c0d",
+      "username": "John Cheung",
+      "name": null
+    },
+    {
+      "id": "7383317f-6740-499f-a33e-cbcc02608e17",
+      "username": "Ivy So",
+      "name": "Ivy So"
+    },
+    {
+      "id": "a2d01a80-42c0-4a03-80bc-39eaaea80180",
+      "username": "Tommychiu",
+      "name": "Tommy Chiu"
+    }
+  ],
+  "sampleProducts": [
+    {
+      "id": "cc11c6c0-286d-4173-8941-80f33ef7d2f3",
+      "title": "3M 膠水 30ml - 到期日2040/1/25",
+      "price": "48"
+    },
+    {
+      "id": "2e29af81-937d-4818-a35a-70373cb4a0f7",
+      "title": "加厚銅喉 15mm×3米",
+      "price": "85"
+    },
+    {
+      "id": "b0540844-bdd9-4086-b6c8-4c34d353904e",
+      "title": "鋰電衝擊鑽 12V",
+      "price": "328"
+    },
+    {
+      "id": "19afb7b5-2eb9-4ce8-8e40-203b4e00f1b8",
+      "title": "PVC-U 排水喉 50mm×4米",
+      "price": "38"
+    },
+    {
+      "id": "428a7772-9988-4af8-9359-8980f7b22257",
+      "title": "纖維柄羊角鎚 16oz",
+      "price": "68"
+    }
+  ]
+}

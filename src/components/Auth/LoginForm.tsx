@@ -1,4 +1,3 @@
-
 // components/Auth/LoginForm.tsx
 'use client';
 
@@ -17,8 +16,36 @@ export default function LoginForm() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const searchParams = useSearchParams();
   
-  // 獲取可能的 callbackUrl
   const callbackUrl = searchParams.get('callbackUrl') || '/';
+
+  // ✅ 發送登入通知郵件
+  const sendLoginNotification = async (email: string, name: string, provider: string) => {
+    try {
+      // 獲取用戶 IP
+      const ipResponse = await fetch('/api/ip');
+      const ipData = await ipResponse.json();
+      
+      const response = await fetch('/api/auth/send-login-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          name,
+          provider,
+          ip: ipData.ip || '無法取得',
+          userAgent: navigator.userAgent,
+        }),
+      });
+      
+      if (!response.ok) {
+        console.error('發送登入通知郵件失敗:', await response.text());
+      }
+    } catch (error) {
+      console.error('發送登入通知郵件錯誤:', error);
+    }
+  };
 
   const handleCredentialsLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,33 +53,44 @@ export default function LoginForm() {
     setIsLoading(true);
 
     try {
+      const userAgent = navigator.userAgent;
+      
+      const ipResponse = await fetch('/api/ip');
+      const ipData = await ipResponse.json();
+      
+      const result = await signIn('credentials', {
+        username,
+        password,
+        redirect: false,
+        callbackUrl: callbackUrl,
+        userAgent: userAgent,
+        ipAddress: ipData.ip || '無法取得',
+      });
 
-          // ✅ 獲取用戶的 IP 和 User-Agent
-    const userAgent = navigator.userAgent;
-    
-    // 獲取 IP（需要通過 API 獲取）
-    const ipResponse = await fetch('/api/ip');
-    const ipData = await ipResponse.json();
-      // 使用 redirect: false 來獲取結果
-    const result = await signIn('credentials', {
-      username,
-      password,
-      redirect: false,
-      callbackUrl: callbackUrl,
-      // ✅ 傳遞額外資訊
-      userAgent: userAgent,
-      ipAddress: ipData.ip || '無法取得',
-    });
-
-      // 檢查登入結果
       if (result?.error) {
         setError('登入失敗，請檢查帳號密碼');
         setIsLoading(false);
       } else if (result?.url) {
-        // 登入成功，手動重定向
+        // ✅ 登入成功後，獲取用戶資訊並發送郵件
+        try {
+          // 獲取當前 session 以獲得用戶 email
+          const sessionResponse = await fetch('/api/auth/session');
+          const sessionData = await sessionResponse.json();
+          
+          if (sessionData?.user?.email) {
+            await sendLoginNotification(
+              sessionData.user.email,
+              sessionData.user.name || username,
+              'credentials'
+            );
+          }
+        } catch (emailError) {
+          console.error('發送郵件失敗:', emailError);
+        }
+        
+        // 重定向
         window.location.href = result.url;
       } else {
-        // 未知情況
         setError('登入發生未知錯誤');
         setIsLoading(false);
       }
@@ -68,11 +106,8 @@ export default function LoginForm() {
     setError('');
 
     try {
-      console.log('Starting Google login with callbackUrl:', callbackUrl);
-      
-      // 對於 Google 登入，使用 redirect: true 讓瀏覽器直接跳轉
       const result = await signIn('google', {
-        redirect: false, // 先獲取結果
+        redirect: false,
         callbackUrl: callbackUrl,
       });
       
@@ -80,7 +115,25 @@ export default function LoginForm() {
         setError('Google 登入失敗，請稍後再試');
         setIsGoogleLoading(false);
       } else if (result?.url) {
-        // 重定向到 Google 登入頁面
+        // ✅ Google 登入成功後，獲取用戶資訊並發送郵件
+        try {
+          // 等待一下讓 session 建立
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          const sessionResponse = await fetch('/api/auth/session');
+          const sessionData = await sessionResponse.json();
+          
+          if (sessionData?.user?.email) {
+            await sendLoginNotification(
+              sessionData.user.email,
+              sessionData.user.name || 'Google 用戶',
+              'google'
+            );
+          }
+        } catch (emailError) {
+          console.error('發送郵件失敗:', emailError);
+        }
+        
         window.location.href = result.url;
       }
       
@@ -91,19 +144,8 @@ export default function LoginForm() {
     }
   };
 
-  // 直接跳轉的 Google 登入方法（備用）
-  // const handleGoogleLoginDirect = () => {
-  //   setIsGoogleLoading(true);
-  //   setError('');
-    
-  //   // 直接構建 Google 登入 URL
-  //   const googleSignInUrl = `/api/auth/signin/google?callbackUrl=${encodeURIComponent(callbackUrl)}`;
-  //   window.location.href = googleSignInUrl;
-  // };
-
   return (
     <div className="space-y-6">
-      {/* 傳統帳密登入表單 */}
       <form onSubmit={handleCredentialsLogin} className="space-y-4">
         <Input
           type="text"
@@ -140,7 +182,6 @@ export default function LoginForm() {
         </Button>
       </form>
 
-      {/* 分隔線 */}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-300" />
@@ -150,7 +191,6 @@ export default function LoginForm() {
         </div>
       </div>
 
-      {/* Google 登入按鈕 */}
       <div className="space-y-2">
         <Button
           variant="outline"
@@ -166,19 +206,7 @@ export default function LoginForm() {
           )}
           使用 Google 登入
         </Button>
-        
-        {/* 備用直接跳轉按鈕（如果上面不工作） */}
-        {/* <Button
-          variant="ghost"
-          className="w-full text-sm"
-          onClick={handleGoogleLoginDirect}
-          disabled={isLoading || isGoogleLoading}
-          type="button"
-        >
-          直接 Google 登入
-        </Button> */}
       </div>
     </div>
   );
 }
-

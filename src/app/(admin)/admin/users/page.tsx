@@ -1,12 +1,11 @@
-// src/app/(admin)/admin/users/page.tsx 或您的檔案路徑
+// src/app/(admin)/admin/users/page.tsx
 'use client';
 
 import useSWR, { useSWRConfig } from 'swr';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input'; // ← 新增 Input
-// import { Label } from '@/components/ui/label'; // ← 可選
+import { Input } from '@/components/ui/input';
 import { Loader2, Edit, Trash2, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -45,6 +44,9 @@ import { createUserAction, updateUserAction, deleteUserAction } from '@/action/U
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
+// ── 型別 ──────────────────────────────────────────────
+type MembershipLevel = 'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM';
+
 type User = {
   id: string;
   username: string;
@@ -52,31 +54,67 @@ type User = {
   email: string | null;
   phone: string | null;
   role: 'ADMIN' | 'USER';
+  currentMembershipLevel: MembershipLevel;
+  membership?: {
+    tierLevel: MembershipLevel;
+    status: string;
+    startsAt: string | null;
+    endsAt: string | null;
+    autoRenew: boolean;
+    tier?: {
+      name: string;
+      color: string | null;
+      benefits: string[];
+      price: number;
+    } | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
 };
 
-// 新增專用 schema（password 必填）
+// ── Zod Schema ────────────────────────────────────────
+const membershipLevelEnum = z.enum(['FREE', 'SILVER', 'GOLD', 'PLATINUM']);
+
 const createUserSchema = z.object({
   username: z.string().min(3, '使用者名稱至少 3 個字'),
   name: z.string().optional(),
   email: z.string().email('Email 格式錯誤').optional().or(z.literal('')),
   phone: z.string().regex(/^09\d{8}$/, '手機格式錯誤（09 開頭共 10 碼）').optional().or(z.literal('')),
   password: z.string().min(6, '密碼至少 6 個字'),
+  currentMembershipLevel: membershipLevelEnum.optional(),
 });
 
 type CreateUserFormData = z.infer<typeof createUserSchema>;
 
-// 編輯專用 schema（password 選填）
 const editUserSchema = createUserSchema.partial().extend({
   password: z.string().min(6).optional().or(z.literal('')),
 });
 
 type EditUserFormData = z.infer<typeof editUserSchema>;
 
+// ── 等級 Badge 顏色 ───────────────────────────────────
+const membershipColors: Record<MembershipLevel, string> = {
+  FREE: 'bg-gray-100 text-gray-700',
+  SILVER: 'bg-gray-200 text-gray-700',
+  GOLD: 'bg-yellow-100 text-yellow-800',
+  PLATINUM: 'bg-purple-100 text-purple-800',
+};
+
+function MembershipBadge({ user }: { user: User }) {
+  const level = user.membership?.tierLevel ?? user.currentMembershipLevel;
+  const displayName = user.membership?.tier?.name ?? level;
+
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium ${membershipColors[level]}`}>
+      {displayName}
+    </span>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────
 export default function UsersPage() {
   const [roleFilter, setRoleFilter] = useState<'USER' | 'ADMIN' | ''>('');
-  const [searchQuery, setSearchQuery] = useState(''); // ← 新增搜尋狀態
+  const [searchQuery, setSearchQuery] = useState('');
   const [openCreate, setOpenCreate] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
@@ -89,7 +127,7 @@ export default function UsersPage() {
     { revalidateOnFocus: false }
   );
 
-  // 搜尋過濾邏輯（前端過濾）
+  // 前端搜尋過濾
   const filteredUsers = users.filter(user => {
     if (!searchQuery.trim()) return true;
 
@@ -103,7 +141,7 @@ export default function UsersPage() {
     );
   });
 
-  // 新增表單（password 必填）
+  // ── 表單 ────────────────────────────────────────────
   const createForm = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
@@ -112,10 +150,10 @@ export default function UsersPage() {
       email: '',
       phone: '',
       password: '',
+      currentMembershipLevel: 'FREE',
     },
   });
 
-  // 編輯表單（password 選填）
   const editForm = useForm<EditUserFormData>({
     resolver: zodResolver(editUserSchema),
     defaultValues: {
@@ -124,15 +162,15 @@ export default function UsersPage() {
       email: '',
       phone: '',
       password: '',
+      currentMembershipLevel: 'FREE',
     },
   });
 
   const refreshUsers = () => {
     swrMutate(currentKey);
-    swrMutate('/api/admin/user'); // 確保全部用戶也更新
+    swrMutate('/api/admin/user');
   };
 
-  // 修復：將 onCreateSubmit 函數改為有實際使用
   const handleCreateSubmit = async (data: CreateUserFormData) => {
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
@@ -184,9 +222,35 @@ export default function UsersPage() {
       email: user.email || '',
       phone: user.phone || '',
       password: '',
+      currentMembershipLevel: user.membership?.tierLevel ?? user.currentMembershipLevel,
     });
     setEditingUser(user);
   };
+
+// ── 共用會員等級 Select ─────────────────────────────
+const MembershipLevelSelect = ({
+  field,
+}: {
+  field: {
+    value: string | undefined;
+    onChange: (value: string) => void;
+  };
+}) => (
+  <Select onValueChange={field.onChange} value={field.value ?? 'FREE'}>
+    <FormControl>
+      <SelectTrigger>
+        <SelectValue placeholder="選擇會員等級" />
+      </SelectTrigger>
+    </FormControl>
+    <SelectContent>
+      <SelectItem value="FREE">免費會員</SelectItem>
+      <SelectItem value="SILVER">銀級會員</SelectItem>
+      <SelectItem value="GOLD">金級會員</SelectItem>
+      <SelectItem value="PLATINUM">白金會員</SelectItem>
+    </SelectContent>
+  </Select>
+);
+
 
   if (isLoading) {
     return <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin" /></div>;
@@ -213,7 +277,6 @@ export default function UsersPage() {
             <DialogTrigger asChild>
               <Button>新增用戶</Button>
             </DialogTrigger>
-            {/* 新增用戶 Dialog 內容 */}
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>新增用戶</DialogTitle>
@@ -255,6 +318,17 @@ export default function UsersPage() {
                       <FormMessage />
                     </FormItem>
                   )} />
+                  <FormField
+                    control={createForm.control}
+                    name="currentMembershipLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>會員等級</FormLabel>
+                        <MembershipLevelSelect field={field} />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <DialogFooter>
                     <Button type="submit">新增用戶</Button>
                   </DialogFooter>
@@ -267,8 +341,8 @@ export default function UsersPage() {
 
       {/* 角色篩選 */}
       <div className="mb-6">
-        <Select 
-          value={roleFilter || "all"} 
+        <Select
+          value={roleFilter || "all"}
           onValueChange={(value) => {
             setRoleFilter(value === "all" ? "" : value as 'USER' | 'ADMIN');
           }}
@@ -300,49 +374,62 @@ export default function UsersPage() {
                 <p>姓名：{user.name || '無'}</p>
                 <p>Email：{user.email || '無'}</p>
                 <p>電話：{user.phone || '無'}</p>
-                <p>角色：<span className={user.role === 'ADMIN' ? 'text-red-600' : 'text-green-600'}>{user.role}</span></p>
-                <p className="text-sm text-gray-500">建立時間：{new Date(user.createdAt).toLocaleString()}</p>
+                <p>
+                  角色：
+                  <span className={user.role === 'ADMIN' ? 'text-red-600' : 'text-green-600'}>
+                    {user.role}
+                  </span>
+                </p>
+                <p className="flex items-center gap-2">
+                  會員等級：
+                  <MembershipBadge user={user} />
+                </p>
+                {user.membership?.endsAt && (
+                  <p className="text-sm text-gray-500">
+                    會員到期：{new Date(user.membership.endsAt).toLocaleDateString()}
+                  </p>
+                )}
+                <p className="text-sm text-gray-500">
+                  建立時間：{new Date(user.createdAt).toLocaleString()}
+                </p>
 
                 <div className="flex gap-2 pt-4">
                   <Button asChild variant="outline" size="sm">
                     <Link href={`/admin/users/${user.id}`}>查看詳情</Link>
                   </Button>
 
-                  
-                    <>
-                      <Button variant="outline" size="sm" onClick={() => openEditDialog(user)}>
-                        <Edit className="h-4 w-4 mr-1" /> 編輯
-                      </Button>
+                  <Button variant="outline" size="sm" onClick={() => openEditDialog(user)}>
+                    <Edit className="h-4 w-4 mr-1" /> 編輯
+                  </Button>
 
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="destructive" size="sm">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>確認刪除？</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              刪除用戶 {user.username} 後無法復原，且若有訂單將拒絕刪除。
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>取消</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete(user.id)}>
-                              確認刪除
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </>
-                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="sm">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>確認刪除？</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          刪除用戶 {user.username} 後無法復原，且若有訂單將拒絕刪除。
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDelete(user.id)}>
+                          確認刪除
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </CardContent>
             </Card>
           ))
         )}
       </div>
+
       {/* 編輯 Dialog */}
       <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
         <DialogContent className="max-w-md">
@@ -386,6 +473,17 @@ export default function UsersPage() {
                   <FormMessage />
                 </FormItem>
               )} />
+              <FormField
+                control={editForm.control}
+                name="currentMembershipLevel"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>會員等級</FormLabel>
+                    <MembershipLevelSelect field={field} />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <DialogFooter>
                 <Button type="submit">儲存變更</Button>
               </DialogFooter>

@@ -5,6 +5,7 @@ import { auth } from "../../auth";
 import { redirect } from "next/navigation";
 
 
+
 // Server Component - 負責身份驗證和數據獲取
 export default async function HomePage() {
   const session = await auth();

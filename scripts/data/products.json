@@ -1,0 +1,1034 @@
+[
+  {
+    "id": "cc11c6c0-286d-4173-8941-80f33ef7d2f3",
+    "title": "3M 膠水 30ml - 到期日2040/1/25",
+    "des": "強力，快乾",
+    "unit": [
+      "支",
+      "個"
+    ],
+    "price": "48",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1768800073946-8fkocgb8e4i-3m-solvent-adhesive-6004-30ml.webp",
+    "categoryId": "18b860bb-3006-4301-84b7-ce863c117173",
+    "materialIds": [
+      "83fac669-ffdd-450c-bcea-7a168cb82f0c"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-01-19T05:21:14.103Z",
+    "updatedAt": "2026-01-19T05:22:30.578Z",
+    "category": {
+      "id": "18b860bb-3006-4301-84b7-ce863c117173",
+      "category": "膠水與接著劑",
+      "createdAt": "2026-01-19T05:18:18.648Z",
+      "updatedAt": "2026-01-19T05:18:18.648Z"
+    },
+    "materials": [
+      {
+        "id": "83fac669-ffdd-450c-bcea-7a168cb82f0c",
+        "materials": "膠",
+        "createdAt": "2026-01-19T05:17:22.152Z",
+        "updatedAt": "2026-01-19T05:17:22.152Z"
+      }
+    ]
+  },
+  {
+    "id": "2e29af81-937d-4818-a35a-70373cb4a0f7",
+    "title": "加厚銅喉 15mm×3米",
+    "des": "高純度紫銅製造，耐高壓耐高溫，適用於冷熱水系統、煤氣管道及空調安裝(圖片只供參考作用)",
+    "unit": [
+      "支"
+    ],
+    "price": "85",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202702180-oaahdao7pn-%E9%8A%85%E5%96%89.png",
+    "categoryId": "fed21e0c-bda8-495b-964b-89f21a1f79eb",
+    "materialIds": [
+      "6c8eb820-cb77-4338-a13f-e9a5c1ef68a0"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-04T10:58:22.209Z",
+    "updatedAt": "2026-02-05T01:24:17.632Z",
+    "category": {
+      "id": "fed21e0c-bda8-495b-964b-89f21a1f79eb",
+      "category": "水喉類",
+      "createdAt": "2026-02-04T10:37:10.689Z",
+      "updatedAt": "2026-02-04T10:37:10.689Z"
+    },
+    "materials": [
+      {
+        "id": "6c8eb820-cb77-4338-a13f-e9a5c1ef68a0",
+        "materials": "紫銅",
+        "createdAt": "2026-02-04T10:38:46.099Z",
+        "updatedAt": "2026-02-04T10:38:46.099Z"
+      }
+    ]
+  },
+  {
+    "id": "b0540844-bdd9-4086-b6c8-4c34d353904e",
+    "title": "鋰電衝擊鑽 12V",
+    "des": "無刷電機設計，雙速調節，18+1段扭力設定，附電池、充電器及鑽頭套裝，適合鑽孔及螺絲鎖緊作業(圖片只供參考作用)",
+    "unit": [
+      "個"
+    ],
+    "price": "328",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202655968-5897ehqvrcd-%E9%9B%BB%E9%91%BD.png",
+    "categoryId": "9581f2b6-3915-4b27-a43c-6860b66258cb",
+    "materialIds": [
+      "b2118f96-8c72-4689-8b79-2cc64d19adba",
+      "ac91f3b6-e769-426a-9348-d1aa41b5d512"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-04T10:57:36.018Z",
+    "updatedAt": "2026-02-05T01:24:06.414Z",
+    "category": {
+      "id": "9581f2b6-3915-4b27-a43c-6860b66258cb",
+      "category": "電動工具類",
+      "createdAt": "2026-02-04T10:57:45.338Z",
+      "updatedAt": "2026-02-04T10:57:45.338Z"
+    },
+    "materials": [
+      {
+        "id": "ac91f3b6-e769-426a-9348-d1aa41b5d512",
+        "materials": "塑料",
+        "createdAt": "2026-02-04T10:38:40.336Z",
+        "updatedAt": "2026-02-04T10:38:40.336Z"
+      },
+      {
+        "id": "b2118f96-8c72-4689-8b79-2cc64d19adba",
+        "materials": "金屬",
+        "createdAt": "2026-02-04T10:38:42.899Z",
+        "updatedAt": "2026-02-04T10:38:42.899Z"
+      }
+    ]
+  },
+  {
+    "id": "19afb7b5-2eb9-4ce8-8e40-203b4e00f1b8",
+    "title": "PVC-U 排水喉 50mm×4米",
+    "des": "優質聚氯乙烯材質，耐酸鹼腐蝕，光滑內壁排水暢通，適用於污水及雨水排放系統\r\n\r\n(圖片只供參考作用)",
+    "unit": [
+      "支"
+    ],
+    "price": "38",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202736060-gwz6qy3osur-PVC%E5%96%89.png",
+    "categoryId": null,
+    "materialIds": [
+      "6aceab3c-4933-4195-b782-1f175988adc8"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-04T10:58:56.100Z",
+    "updatedAt": "2026-02-04T10:58:56.100Z",
+    "category": null,
+    "materials": [
+      {
+        "id": "6aceab3c-4933-4195-b782-1f175988adc8",
+        "materials": "PVC-U",
+        "createdAt": "2026-02-04T10:38:49.508Z",
+        "updatedAt": "2026-02-04T10:38:49.508Z"
+      }
+    ]
+  },
+  {
+    "id": "428a7772-9988-4af8-9359-8980f7b22257",
+    "title": "纖維柄羊角鎚 16oz",
+    "des": "高碳鋼鎚頭配防滑纖維手柄，羊角設計方便拔釘，適合木工及一般裝修工程\r\n(圖片只供參考作用)",
+    "unit": [
+      "支"
+    ],
+    "price": "68",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202368540-1ghdla9nmjk-%E9%8E%9A%E4%BB%94.png",
+    "categoryId": "766074fa-934f-4042-b721-5c3b0fe15b51",
+    "materialIds": [
+      "3c16bbaa-a69d-4467-9716-26257dcf7b61",
+      "ee66a176-9309-4931-bda1-9ad82e8006fd"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-04T10:52:48.570Z",
+    "updatedAt": "2026-02-04T10:53:14.730Z",
+    "category": {
+      "id": "766074fa-934f-4042-b721-5c3b0fe15b51",
+      "category": "工具類",
+      "createdAt": "2026-02-04T10:37:07.450Z",
+      "updatedAt": "2026-02-04T10:37:07.450Z"
+    },
+    "materials": [
+      {
+        "id": "ee66a176-9309-4931-bda1-9ad82e8006fd",
+        "materials": "木",
+        "createdAt": "2026-01-19T05:17:36.486Z",
+        "updatedAt": "2026-01-19T05:17:36.486Z"
+      },
+      {
+        "id": "3c16bbaa-a69d-4467-9716-26257dcf7b61",
+        "materials": "高碳鋼頭",
+        "createdAt": "2026-02-04T10:38:07.255Z",
+        "updatedAt": "2026-02-04T10:38:07.255Z"
+      }
+    ]
+  },
+  {
+    "id": "77b70726-45d0-4689-9135-92b0a707ba3e",
+    "title": "專業級尖嘴鉗 6吋",
+    "des": "高硬度鉻釩鋼製造，精密剪切及夾持功能，電工絕緣手柄，適合電線加工及精細作業\r\n(圖片只供參考作用)",
+    "unit": [
+      "個"
+    ],
+    "price": "55",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202573653-9pp7mc7i59-%E9%89%97.png",
+    "categoryId": "766074fa-934f-4042-b721-5c3b0fe15b51",
+    "materialIds": [
+      "9e3cae5a-4f03-4557-9687-b3a5502457f0"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-04T10:56:13.696Z",
+    "updatedAt": "2026-02-04T10:56:13.696Z",
+    "category": {
+      "id": "766074fa-934f-4042-b721-5c3b0fe15b51",
+      "category": "工具類",
+      "createdAt": "2026-02-04T10:37:07.450Z",
+      "updatedAt": "2026-02-04T10:37:07.450Z"
+    },
+    "materials": [
+      {
+        "id": "9e3cae5a-4f03-4557-9687-b3a5502457f0",
+        "materials": "鉻釩鋼批頭",
+        "createdAt": "2026-02-04T10:38:12.939Z",
+        "updatedAt": "2026-02-04T10:38:12.939Z"
+      }
+    ]
+  },
+  {
+    "id": "ea2bd6e9-ad15-4513-82f3-4574a4b40b5b",
+    "title": "多功能螺絲批",
+    "des": "磁性批頭設計，防滑軟膠手柄，適合家居維修及電子產品拆裝\r\n(圖片只供參考作用)",
+    "unit": [
+      "個"
+    ],
+    "price": "45",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202586802-hti2jf0nfx-%E8%9E%BA%E7%B5%B2%E6%89%B9.png",
+    "categoryId": "766074fa-934f-4042-b721-5c3b0fe15b51",
+    "materialIds": [
+      "ba3b33f1-70bf-468c-887c-eb4cfe6d7eba",
+      "9e3cae5a-4f03-4557-9687-b3a5502457f0"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-04T10:54:46.789Z",
+    "updatedAt": "2026-02-04T10:56:26.845Z",
+    "category": {
+      "id": "766074fa-934f-4042-b721-5c3b0fe15b51",
+      "category": "工具類",
+      "createdAt": "2026-02-04T10:37:07.450Z",
+      "updatedAt": "2026-02-04T10:37:07.450Z"
+    },
+    "materials": [
+      {
+        "id": "9e3cae5a-4f03-4557-9687-b3a5502457f0",
+        "materials": "鉻釩鋼批頭",
+        "createdAt": "2026-02-04T10:38:12.939Z",
+        "updatedAt": "2026-02-04T10:38:12.939Z"
+      },
+      {
+        "id": "ba3b33f1-70bf-468c-887c-eb4cfe6d7eba",
+        "materials": "TPR手柄",
+        "createdAt": "2026-02-04T10:38:15.533Z",
+        "updatedAt": "2026-02-04T10:38:15.533Z"
+      }
+    ]
+  },
+  {
+    "id": "4b864724-614c-430b-8684-9d53388d84ff",
+    "title": "鍍鋅鐵喉 20mm×3.8米",
+    "des": "熱浸鍍鋅處理，防鏽耐用，螺紋接口設計，適用於電線保護管、消防系統及工業管道\r\n\r\n(圖片只供參考作用)",
+    "unit": [
+      "支"
+    ],
+    "price": "42",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202778396-1uw7cnznt6q-%E9%90%B5%E5%96%89.png",
+    "categoryId": null,
+    "materialIds": [
+      "f4145a2e-1a0b-4c18-920a-f941353c1adf",
+      "21acf49c-da8e-47b8-9685-0b96fc0c38f6"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-04T10:59:38.423Z",
+    "updatedAt": "2026-02-04T10:59:38.423Z",
+    "category": null,
+    "materials": [
+      {
+        "id": "21acf49c-da8e-47b8-9685-0b96fc0c38f6",
+        "materials": "低碳鋼",
+        "createdAt": "2026-02-04T10:38:53.239Z",
+        "updatedAt": "2026-02-04T10:38:53.239Z"
+      },
+      {
+        "id": "f4145a2e-1a0b-4c18-920a-f941353c1adf",
+        "materials": "鋅層",
+        "createdAt": "2026-02-04T10:38:55.584Z",
+        "updatedAt": "2026-02-04T10:38:55.584Z"
+      }
+    ]
+  },
+  {
+    "id": "53e47bf6-ebb7-477c-99b6-57e27a0d44f9",
+    "title": "防滑耐磨工作手套 L碼",
+    "des": "掌面塗層防滑設計，透氣針織手背，彈性腕口防塵，適合搬運、裝修及園藝作業\r\n\r\n(圖片只供參考作用)",
+    "unit": [
+      "對"
+    ],
+    "price": "25",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202817036-b9ey1aqmdmr-%E6%89%8B%E5%A5%97.png",
+    "categoryId": null,
+    "materialIds": [
+      "ac91f3b6-e769-426a-9348-d1aa41b5d512"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-04T11:00:17.063Z",
+    "updatedAt": "2026-02-04T11:00:17.063Z",
+    "category": null,
+    "materials": [
+      {
+        "id": "ac91f3b6-e769-426a-9348-d1aa41b5d512",
+        "materials": "塑料",
+        "createdAt": "2026-02-04T10:38:40.336Z",
+        "updatedAt": "2026-02-04T10:38:40.336Z"
+      }
+    ]
+  },
+  {
+    "id": "cb8a34dd-2946-4c25-8cd0-7ed51f65c484",
+    "title": "吸水地拖",
+    "des": "超細纖維拖布，強力吸水去污，360度旋轉拖把頭，伸縮鋁合金桿，適合家居及商業地板清潔\r\n\r\n(圖片只供參考作用)",
+    "unit": [
+      "支"
+    ],
+    "price": "25",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202855995-7gw54o5qsvx-%E5%9C%B0%E6%8B%96.png",
+    "categoryId": null,
+    "materialIds": [
+      "ee66a176-9309-4931-bda1-9ad82e8006fd",
+      "da0b7fc3-a220-4c73-b4c1-a62db4dabe61"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-04T11:00:56.024Z",
+    "updatedAt": "2026-02-04T11:00:56.024Z",
+    "category": null,
+    "materials": [
+      {
+        "id": "ee66a176-9309-4931-bda1-9ad82e8006fd",
+        "materials": "木",
+        "createdAt": "2026-01-19T05:17:36.486Z",
+        "updatedAt": "2026-01-19T05:17:36.486Z"
+      },
+      {
+        "id": "da0b7fc3-a220-4c73-b4c1-a62db4dabe61",
+        "materials": "PET",
+        "createdAt": "2026-02-04T10:39:08.112Z",
+        "updatedAt": "2026-02-04T10:39:08.112Z"
+      }
+    ]
+  },
+  {
+    "id": "4847f279-3ddb-44c0-afb1-15fba4947297",
+    "title": "彈性外牆漆 18公升",
+    "des": "高彈性防水配方，抗紫外線耐候性強，透氣防裂，優異附著力，適合混凝土、磚牆等外牆面保護\r\n\r\n(圖片只供參考作用)",
+    "unit": [
+      "桶"
+    ],
+    "price": "458",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202915308-gdgr37uyef-%E5%A4%96%E7%89%86%E6%BC%86.png",
+    "categoryId": null,
+    "materialIds": [
+      "3d6e613c-1aa4-4549-933e-4909b1bdbd6b"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-04T11:01:55.335Z",
+    "updatedAt": "2026-02-04T11:01:55.335Z",
+    "category": null,
+    "materials": [
+      {
+        "id": "3d6e613c-1aa4-4549-933e-4909b1bdbd6b",
+        "materials": "耐候顏料",
+        "createdAt": "2026-02-04T10:39:34.802Z",
+        "updatedAt": "2026-02-04T10:39:34.802Z"
+      }
+    ]
+  },
+  {
+    "id": "48ff2ea1-d517-45f4-ae37-068bcb8a9530",
+    "title": "不鏽鋼螺絲六角(1粒)",
+    "des": "304不鏽鋼材質，六角頭設計，防鏽耐腐蝕，適用於機械設備、建築裝配及戶外設施固定(圖片只供參考作用)",
+    "unit": [
+      "貓",
+      "個"
+    ],
+    "price": "1",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202234016-bms5kwl0luv-%E4%B8%8D%E9%8F%BD%E9%8B%BC%E8%9E%BA%E7%B5%B2%20%E5%85%AD%E8%A7%92.png",
+    "categoryId": "e3933df3-d5b8-4597-839e-c59bd3b6342b",
+    "materialIds": [
+      "20e32374-f3a4-45e8-a795-4f34954fa567"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-03T11:09:09.010Z",
+    "updatedAt": "2026-02-05T01:23:21.289Z",
+    "category": {
+      "id": "e3933df3-d5b8-4597-839e-c59bd3b6342b",
+      "category": "螺絲類",
+      "createdAt": "2026-02-04T10:37:04.154Z",
+      "updatedAt": "2026-02-04T10:37:04.154Z"
+    },
+    "materials": [
+      {
+        "id": "20e32374-f3a4-45e8-a795-4f34954fa567",
+        "materials": "304不鏽鋼",
+        "createdAt": "2026-02-04T10:38:01.967Z",
+        "updatedAt": "2026-02-04T10:38:01.967Z"
+      }
+    ]
+  },
+  {
+    "id": "e916eed5-2c36-4fcf-8fb5-5d0aae138fb6",
+    "title": "不鏽鋼六角螺絲 M6×20mm (50粒)",
+    "des": "304不鏽鋼材質，六角頭設計，防鏽耐腐蝕，適用於機械設備、建築裝配及戶外設施固定(圖片只供參考作用)",
+    "unit": [
+      "包"
+    ],
+    "price": "15",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202311423-94dv1zb8cwr-%E4%B8%8D%E9%8F%BD%E9%8B%BC%E8%9E%BA%E7%B5%B2%20%E5%85%AD%E8%A7%92.png",
+    "categoryId": "e3933df3-d5b8-4597-839e-c59bd3b6342b",
+    "materialIds": [
+      "20e32374-f3a4-45e8-a795-4f34954fa567"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-04T10:51:51.471Z",
+    "updatedAt": "2026-02-05T01:54:21.136Z",
+    "category": {
+      "id": "e3933df3-d5b8-4597-839e-c59bd3b6342b",
+      "category": "螺絲類",
+      "createdAt": "2026-02-04T10:37:04.154Z",
+      "updatedAt": "2026-02-04T10:37:04.154Z"
+    },
+    "materials": [
+      {
+        "id": "20e32374-f3a4-45e8-a795-4f34954fa567",
+        "materials": "304不鏽鋼",
+        "createdAt": "2026-02-04T10:38:01.967Z",
+        "updatedAt": "2026-02-04T10:38:01.967Z"
+      }
+    ]
+  },
+  {
+    "id": "9fd220d3-2001-409b-a535-f5a44b1e7272",
+    "title": "淨味防霉乳膠漆 5公升",
+    "des": "水性環保配方，低VOC無異味，優異遮蓋力及耐擦洗性，防霉抗菌，適合室內牆面及天花塗裝(圖片只供參考作用)",
+    "unit": [
+      "桶"
+    ],
+    "price": "188",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202885848-00bkqyql7abj8-%E4%B9%B3%E8%86%A0%E6%BC%86.png",
+    "categoryId": null,
+    "materialIds": [
+      "7e61b7ba-8958-427e-90f8-c11b403a942a",
+      "7ed8841c-cb80-487b-b46a-e1ea02fadebd"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-04T11:01:25.880Z",
+    "updatedAt": "2026-02-05T01:24:38.367Z",
+    "category": null,
+    "materials": [
+      {
+        "id": "7e61b7ba-8958-427e-90f8-c11b403a942a",
+        "materials": "丙烯酸乳液",
+        "createdAt": "2026-02-04T10:39:22.560Z",
+        "updatedAt": "2026-02-04T10:39:22.560Z"
+      },
+      {
+        "id": "7ed8841c-cb80-487b-b46a-e1ea02fadebd",
+        "materials": "鈦白粉",
+        "createdAt": "2026-02-04T10:39:25.218Z",
+        "updatedAt": "2026-02-04T10:39:25.218Z"
+      }
+    ]
+  },
+  {
+    "id": "d0b42c85-5e2c-4e1e-9fed-5927e1e5ea5a",
+    "title": "不鏽鋼圓頭螺絲 M4×16mm(100粒)",
+    "des": "304不鏽鋼圓頭十字螺絲，表面光滑美觀，適用於傢俬、電器外殼及裝飾工程(圖片只供參考作用)",
+    "unit": [
+      "包"
+    ],
+    "price": "15",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1770202265727-649s5fj2mlb-%E4%B8%8D%E9%8F%BD%E9%8B%BC%E8%9E%BA%E7%B5%B2%20%E5%9C%93%E8%A7%92.png",
+    "categoryId": "e3933df3-d5b8-4597-839e-c59bd3b6342b",
+    "materialIds": [
+      "20e32374-f3a4-45e8-a795-4f34954fa567"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-02-04T03:36:45.600Z",
+    "updatedAt": "2026-02-05T01:54:14.238Z",
+    "category": {
+      "id": "e3933df3-d5b8-4597-839e-c59bd3b6342b",
+      "category": "螺絲類",
+      "createdAt": "2026-02-04T10:37:04.154Z",
+      "updatedAt": "2026-02-04T10:37:04.154Z"
+    },
+    "materials": [
+      {
+        "id": "20e32374-f3a4-45e8-a795-4f34954fa567",
+        "materials": "304不鏽鋼",
+        "createdAt": "2026-02-04T10:38:01.967Z",
+        "updatedAt": "2026-02-04T10:38:01.967Z"
+      }
+    ]
+  },
+  {
+    "id": "d42a4b2b-6402-451b-8291-1ea483559c85",
+    "title": "介刀",
+    "des": "平價介刀",
+    "unit": [
+      "支"
+    ],
+    "price": "5",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780290403497-kjqkg61mjbo-image.jpg",
+    "categoryId": null,
+    "materialIds": [
+      "900219d9-8ddf-4ab7-a452-1f0d23bc2c00"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T05:06:43.577Z",
+    "updatedAt": "2026-06-01T05:06:43.577Z",
+    "category": null,
+    "materials": [
+      {
+        "id": "900219d9-8ddf-4ab7-a452-1f0d23bc2c00",
+        "materials": "鐵",
+        "createdAt": "2026-01-19T05:17:25.624Z",
+        "updatedAt": "2026-01-19T05:17:25.624Z"
+      }
+    ]
+  },
+  {
+    "id": "aca87fd9-4bec-4441-a82f-03ed1c06f025",
+    "title": "立邦批墙灰",
+    "des": "淨味1千克",
+    "unit": [
+      "桶"
+    ],
+    "price": "38",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780292632947-0a3s8a7bphq7-image.jpg",
+    "categoryId": "4d8a78b3-9a84-4564-a222-346a46d6a378",
+    "materialIds": [
+      "3d6e613c-1aa4-4549-933e-4909b1bdbd6b"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T05:43:53.054Z",
+    "updatedAt": "2026-06-01T05:44:25.226Z",
+    "category": {
+      "id": "4d8a78b3-9a84-4564-a222-346a46d6a378",
+      "category": "油漆/塗料類",
+      "createdAt": "2026-02-04T10:37:18.842Z",
+      "updatedAt": "2026-02-04T10:37:18.842Z"
+    },
+    "materials": [
+      {
+        "id": "3d6e613c-1aa4-4549-933e-4909b1bdbd6b",
+        "materials": "耐候顏料",
+        "createdAt": "2026-02-04T10:39:34.802Z",
+        "updatedAt": "2026-02-04T10:39:34.802Z"
+      }
+    ]
+  },
+  {
+    "id": "98141eb3-3862-4202-9f8e-c5b241ea1521",
+    "title": "武士拉尺",
+    "des": "7.5米",
+    "unit": [
+      "個"
+    ],
+    "price": "45",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780292874712-smgdwxf5sjc-image.jpg",
+    "categoryId": "766074fa-934f-4042-b721-5c3b0fe15b51",
+    "materialIds": [
+      "ac91f3b6-e769-426a-9348-d1aa41b5d512"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T05:47:54.812Z",
+    "updatedAt": "2026-06-01T05:47:54.812Z",
+    "category": {
+      "id": "766074fa-934f-4042-b721-5c3b0fe15b51",
+      "category": "工具類",
+      "createdAt": "2026-02-04T10:37:07.450Z",
+      "updatedAt": "2026-02-04T10:37:07.450Z"
+    },
+    "materials": [
+      {
+        "id": "ac91f3b6-e769-426a-9348-d1aa41b5d512",
+        "materials": "塑料",
+        "createdAt": "2026-02-04T10:38:40.336Z",
+        "updatedAt": "2026-02-04T10:38:40.336Z"
+      }
+    ]
+  },
+  {
+    "id": "6217f1c4-7a26-4b89-9d66-f57b80e43cdb",
+    "title": "袋鼠英泥寶",
+    "des": "18升",
+    "unit": [
+      "桶"
+    ],
+    "price": "560",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780293679538-b2xp8n07jx9-image.jpg",
+    "categoryId": "18b860bb-3006-4301-84b7-ce863c117173",
+    "materialIds": [
+      "3d6e613c-1aa4-4549-933e-4909b1bdbd6b"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:01:19.618Z",
+    "updatedAt": "2026-06-01T06:01:52.314Z",
+    "category": {
+      "id": "18b860bb-3006-4301-84b7-ce863c117173",
+      "category": "膠水與接著劑",
+      "createdAt": "2026-01-19T05:18:18.648Z",
+      "updatedAt": "2026-01-19T05:18:18.648Z"
+    },
+    "materials": [
+      {
+        "id": "3d6e613c-1aa4-4549-933e-4909b1bdbd6b",
+        "materials": "耐候顏料",
+        "createdAt": "2026-02-04T10:39:34.802Z",
+        "updatedAt": "2026-02-04T10:39:34.802Z"
+      }
+    ]
+  },
+  {
+    "id": "bc9282b4-336b-44cc-be36-5d0261fc8a4f",
+    "title": "牛皮布",
+    "des": "2寸厚",
+    "unit": [
+      "個"
+    ],
+    "price": "13",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780293855957-rul6rj3d9dj-image.jpg",
+    "categoryId": "18b860bb-3006-4301-84b7-ce863c117173",
+    "materialIds": [
+      "83fac669-ffdd-450c-bcea-7a168cb82f0c"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:04:16.035Z",
+    "updatedAt": "2026-06-01T06:04:16.035Z",
+    "category": {
+      "id": "18b860bb-3006-4301-84b7-ce863c117173",
+      "category": "膠水與接著劑",
+      "createdAt": "2026-01-19T05:18:18.648Z",
+      "updatedAt": "2026-01-19T05:18:18.648Z"
+    },
+    "materials": [
+      {
+        "id": "83fac669-ffdd-450c-bcea-7a168cb82f0c",
+        "materials": "膠",
+        "createdAt": "2026-01-19T05:17:22.152Z",
+        "updatedAt": "2026-01-19T05:17:22.152Z"
+      }
+    ]
+  },
+  {
+    "id": "657c11cf-7eea-422b-a44d-c4e3171e9db7",
+    "title": "水槍",
+    "des": "60-289噴水槍組",
+    "unit": [
+      "支"
+    ],
+    "price": "55",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780294026453-sizs8kdx5u-image.jpg",
+    "categoryId": "766074fa-934f-4042-b721-5c3b0fe15b51",
+    "materialIds": [
+      "ac91f3b6-e769-426a-9348-d1aa41b5d512"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:07:06.553Z",
+    "updatedAt": "2026-06-01T06:07:06.553Z",
+    "category": {
+      "id": "766074fa-934f-4042-b721-5c3b0fe15b51",
+      "category": "工具類",
+      "createdAt": "2026-02-04T10:37:07.450Z",
+      "updatedAt": "2026-02-04T10:37:07.450Z"
+    },
+    "materials": [
+      {
+        "id": "ac91f3b6-e769-426a-9348-d1aa41b5d512",
+        "materials": "塑料",
+        "createdAt": "2026-02-04T10:38:40.336Z",
+        "updatedAt": "2026-02-04T10:38:40.336Z"
+      }
+    ]
+  },
+  {
+    "id": "6d8d6723-6c11-4cac-b3e7-b0202905ca5d",
+    "title": "水槍",
+    "des": "13-15mm-4分/5分咀",
+    "unit": [
+      "支"
+    ],
+    "price": "125",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780294155078-rgtsyk378r-image.jpg",
+    "categoryId": "766074fa-934f-4042-b721-5c3b0fe15b51",
+    "materialIds": [
+      "ac91f3b6-e769-426a-9348-d1aa41b5d512"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:09:15.147Z",
+    "updatedAt": "2026-06-01T06:09:15.147Z",
+    "category": {
+      "id": "766074fa-934f-4042-b721-5c3b0fe15b51",
+      "category": "工具類",
+      "createdAt": "2026-02-04T10:37:07.450Z",
+      "updatedAt": "2026-02-04T10:37:07.450Z"
+    },
+    "materials": [
+      {
+        "id": "ac91f3b6-e769-426a-9348-d1aa41b5d512",
+        "materials": "塑料",
+        "createdAt": "2026-02-04T10:38:40.336Z",
+        "updatedAt": "2026-02-04T10:38:40.336Z"
+      }
+    ]
+  },
+  {
+    "id": "84295284-1225-4386-9672-cf4e8f9c3075",
+    "title": "膠喉剪",
+    "des": "33mm",
+    "unit": [
+      "支"
+    ],
+    "price": "45",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780294303101-2tzkav3d24a-image.jpg",
+    "categoryId": "766074fa-934f-4042-b721-5c3b0fe15b51",
+    "materialIds": [
+      "ac91f3b6-e769-426a-9348-d1aa41b5d512"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:11:43.173Z",
+    "updatedAt": "2026-06-01T06:11:43.173Z",
+    "category": {
+      "id": "766074fa-934f-4042-b721-5c3b0fe15b51",
+      "category": "工具類",
+      "createdAt": "2026-02-04T10:37:07.450Z",
+      "updatedAt": "2026-02-04T10:37:07.450Z"
+    },
+    "materials": [
+      {
+        "id": "ac91f3b6-e769-426a-9348-d1aa41b5d512",
+        "materials": "塑料",
+        "createdAt": "2026-02-04T10:38:40.336Z",
+        "updatedAt": "2026-02-04T10:38:40.336Z"
+      }
+    ]
+  },
+  {
+    "id": "0b0de7ce-04c3-4d87-8468-750ce8d8bfb8",
+    "title": "火槍",
+    "des": "PR-8080",
+    "unit": [
+      "支"
+    ],
+    "price": "69",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780294434376-iuo5wa1lmmk-image.jpg",
+    "categoryId": "766074fa-934f-4042-b721-5c3b0fe15b51",
+    "materialIds": [
+      "dd01d768-48c0-4e51-a8fe-51ecb9d6c64e"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:13:54.471Z",
+    "updatedAt": "2026-06-01T06:13:54.471Z",
+    "category": {
+      "id": "766074fa-934f-4042-b721-5c3b0fe15b51",
+      "category": "工具類",
+      "createdAt": "2026-02-04T10:37:07.450Z",
+      "updatedAt": "2026-02-04T10:37:07.450Z"
+    },
+    "materials": [
+      {
+        "id": "dd01d768-48c0-4e51-a8fe-51ecb9d6c64e",
+        "materials": "鋁合金桿",
+        "createdAt": "2026-02-04T10:39:17.507Z",
+        "updatedAt": "2026-02-04T10:39:17.507Z"
+      }
+    ]
+  },
+  {
+    "id": "7454f2a3-6421-4df2-9bea-de4f96f638d0",
+    "title": "水筆",
+    "des": null,
+    "unit": [
+      "支"
+    ],
+    "price": "12",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780294703509-w12xzbvgp9r-image.jpg",
+    "categoryId": "766074fa-934f-4042-b721-5c3b0fe15b51",
+    "materialIds": [
+      "ac91f3b6-e769-426a-9348-d1aa41b5d512"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:18:23.589Z",
+    "updatedAt": "2026-06-01T06:18:23.589Z",
+    "category": {
+      "id": "766074fa-934f-4042-b721-5c3b0fe15b51",
+      "category": "工具類",
+      "createdAt": "2026-02-04T10:37:07.450Z",
+      "updatedAt": "2026-02-04T10:37:07.450Z"
+    },
+    "materials": [
+      {
+        "id": "ac91f3b6-e769-426a-9348-d1aa41b5d512",
+        "materials": "塑料",
+        "createdAt": "2026-02-04T10:38:40.336Z",
+        "updatedAt": "2026-02-04T10:38:40.336Z"
+      }
+    ]
+  },
+  {
+    "id": "e0569a68-44b1-49c2-bf3f-35d8ab3daf1b",
+    "title": "浴缸龍頭 Wall-mounted",
+    "des": "牆出式浴缸專用龍頭，標準6分咀規格，适配多數浴室牆面管路。出水穩定、調溫順暢，防水防漏、堅固耐用，適用居家及商業浴室泡澡注水使用。\r\nWall-mounted dedicated bathtub faucet with standard 6-point nozzle. Compatible with most bathroom wall pipelines. It features stable water output, smooth temperature adjustment, leak-proof and durable, ideal for household and commercial bathroom use.",
+    "unit": [
+      "個"
+    ],
+    "price": "495",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780295669581-uzi04zjxd5-image.jpg",
+    "categoryId": "fed21e0c-bda8-495b-964b-89f21a1f79eb",
+    "materialIds": [
+      "625fa4c2-ca3f-4f16-8eac-5acaff666b93"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:34:29.648Z",
+    "updatedAt": "2026-08-10T08:21:15.393Z",
+    "category": {
+      "id": "fed21e0c-bda8-495b-964b-89f21a1f79eb",
+      "category": "水喉類",
+      "createdAt": "2026-02-04T10:37:10.689Z",
+      "updatedAt": "2026-02-04T10:37:10.689Z"
+    },
+    "materials": [
+      {
+        "id": "625fa4c2-ca3f-4f16-8eac-5acaff666b93",
+        "materials": "銅",
+        "createdAt": "2026-01-19T05:17:33.984Z",
+        "updatedAt": "2026-01-19T05:17:33.984Z"
+      }
+    ]
+  },
+  {
+    "id": "50547a82-dda6-4e99-a537-7b5e483062be",
+    "title": "星盆龍頭 Sink Faucet",
+    "des": "多功能星盆專用龍頭，支援橫出、底上雙出水模式，安裝靈活百搭。水流順暢易調控，防腐抗鏽、密封性佳，適用廚房、洗手盆日常用水與清潔。\r\nMulti-functional sink faucet with side and bottom dual water outlets for flexible installation. It delivers smooth adjustable water flow, is anti-corrosion and leak-proof, perfect for daily kitchen and washbasin use.",
+    "unit": [
+      "個"
+    ],
+    "price": "158",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780295566709-0hkd5slovowm-image.jpg",
+    "categoryId": "fed21e0c-bda8-495b-964b-89f21a1f79eb",
+    "materialIds": [
+      "625fa4c2-ca3f-4f16-8eac-5acaff666b93"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:32:46.772Z",
+    "updatedAt": "2026-08-10T08:21:42.160Z",
+    "category": {
+      "id": "fed21e0c-bda8-495b-964b-89f21a1f79eb",
+      "category": "水喉類",
+      "createdAt": "2026-02-04T10:37:10.689Z",
+      "updatedAt": "2026-02-04T10:37:10.689Z"
+    },
+    "materials": [
+      {
+        "id": "625fa4c2-ca3f-4f16-8eac-5acaff666b93",
+        "materials": "銅",
+        "createdAt": "2026-01-19T05:17:33.984Z",
+        "updatedAt": "2026-01-19T05:17:33.984Z"
+      }
+    ]
+  },
+  {
+    "id": "332eda32-5e5a-4832-8f8b-6776adc5a003",
+    "title": "AA超能膠 Debonder",
+    "des": "快速固化萬用超能膠，黏結力強、乾燥速度快，適用金屬、塑膠、陶瓷、木材等多種材質。操作簡單，固化後穩固持久，適用日常修補與小型粘接作業。\r\nFast-curing universal super glue with strong adhesion. Suitable for metal, plastic, ceramic, wood and other materials. Easy to use, firm and durable after curing, ideal for daily repair and small bonding work.",
+    "unit": [
+      "支"
+    ],
+    "price": "12",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780295245586-c7nnq8omdp-image.jpg",
+    "categoryId": "18b860bb-3006-4301-84b7-ce863c117173",
+    "materialIds": [
+      "83fac669-ffdd-450c-bcea-7a168cb82f0c"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:27:25.653Z",
+    "updatedAt": "2026-08-10T08:22:43.285Z",
+    "category": {
+      "id": "18b860bb-3006-4301-84b7-ce863c117173",
+      "category": "膠水與接著劑",
+      "createdAt": "2026-01-19T05:18:18.648Z",
+      "updatedAt": "2026-01-19T05:18:18.648Z"
+    },
+    "materials": [
+      {
+        "id": "83fac669-ffdd-450c-bcea-7a168cb82f0c",
+        "materials": "膠",
+        "createdAt": "2026-01-19T05:17:22.152Z",
+        "updatedAt": "2026-01-19T05:17:22.152Z"
+      }
+    ]
+  },
+  {
+    "id": "139f00a7-8927-4eaf-adc5-b35eb10fb596",
+    "title": "花酒頭 Shower Head",
+    "des": "通用型浴室花灑頭，出水均勻細膩，水流柔和不刺眼，可有效節水。材質抗鏽耐腐、不易堵塞，安裝簡易，适配多數浴室花灑管路，提升沐浴體驗。\r\nUniversal bathroom shower head with even and soft water output and water-saving effect. It is rust-proof, corrosion-resistant and anti-clogging, easy to install, compatible with most shower pipelines to optimize bathing experience.",
+    "unit": [
+      "個"
+    ],
+    "price": "59",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780295029889-w0sbxuzy8mc-image.jpg",
+    "categoryId": "fed21e0c-bda8-495b-964b-89f21a1f79eb",
+    "materialIds": [
+      "83fac669-ffdd-450c-bcea-7a168cb82f0c"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:23:49.951Z",
+    "updatedAt": "2026-08-10T08:23:34.606Z",
+    "category": {
+      "id": "fed21e0c-bda8-495b-964b-89f21a1f79eb",
+      "category": "水喉類",
+      "createdAt": "2026-02-04T10:37:10.689Z",
+      "updatedAt": "2026-02-04T10:37:10.689Z"
+    },
+    "materials": [
+      {
+        "id": "83fac669-ffdd-450c-bcea-7a168cb82f0c",
+        "materials": "膠",
+        "createdAt": "2026-01-19T05:17:22.152Z",
+        "updatedAt": "2026-01-19T05:17:22.152Z"
+      }
+    ]
+  },
+  {
+    "id": "79b233d9-c306-480d-8ab8-76f0604c20d3",
+    "title": "立邦乳膠漆 Nippon Latex Paint Super 5-in-1",
+    "des": "白-1902\r\n\r\n環保乳膠漆，塗刷順滑、覆蓋力強，色澤均勻飽滿。淨味環保、防潮防霉、耐擦洗，適用居家、商業空間牆面塗裝翻新。\r\nEco-friendly latex paint of well-known brand with smooth painting and strong coverage. It is odorless, moisture-proof, mildew-proof and washable, suitable for wall painting and renovation of household and commercial spaces.",
+    "unit": [
+      "桶"
+    ],
+    "price": "360",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780294850743-j14w9cp8cta-image.jpg",
+    "categoryId": "4d8a78b3-9a84-4564-a222-346a46d6a378",
+    "materialIds": [
+      "ea3488e3-f212-43ac-9cb8-2beae31e61ad"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:20:50.824Z",
+    "updatedAt": "2026-08-10T08:24:54.962Z",
+    "category": {
+      "id": "4d8a78b3-9a84-4564-a222-346a46d6a378",
+      "category": "油漆/塗料類",
+      "createdAt": "2026-02-04T10:37:18.842Z",
+      "updatedAt": "2026-02-04T10:37:18.842Z"
+    },
+    "materials": [
+      {
+        "id": "ea3488e3-f212-43ac-9cb8-2beae31e61ad",
+        "materials": "純丙乳液",
+        "createdAt": "2026-02-04T10:39:31.159Z",
+        "updatedAt": "2026-02-04T10:39:31.159Z"
+      }
+    ]
+  },
+  {
+    "id": "0bd72f8c-b0d8-46e4-8cf1-ebcfd8930c2c",
+    "title": "金屬王 Metal King Gasket Washer",
+    "des": "高品質金屬墊片鐵碟，材質堅韌耐磨，密封性與穩定性極佳。可緩衝減壓、防鬆防漏，適用各類五金管路、機械設備的連接密封配件。\r\nHigh-quality metal gasket washer with tough and wear-resistant material and excellent tightness. It can buffer pressure, prevent loosening and leakage, suitable for connection and sealing of various hardware pipelines and mechanical equipment.",
+    "unit": [
+      "個"
+    ],
+    "price": "5",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780295372627-85kmfbyfxbv-image.jpg",
+    "categoryId": "766074fa-934f-4042-b721-5c3b0fe15b51",
+    "materialIds": [
+      "900219d9-8ddf-4ab7-a452-1f0d23bc2c00"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:29:32.704Z",
+    "updatedAt": "2026-08-10T08:22:03.200Z",
+    "category": {
+      "id": "766074fa-934f-4042-b721-5c3b0fe15b51",
+      "category": "工具類",
+      "createdAt": "2026-02-04T10:37:07.450Z",
+      "updatedAt": "2026-02-04T10:37:07.450Z"
+    },
+    "materials": [
+      {
+        "id": "900219d9-8ddf-4ab7-a452-1f0d23bc2c00",
+        "materials": "鐵",
+        "createdAt": "2026-01-19T05:17:25.624Z",
+        "updatedAt": "2026-01-19T05:17:25.624Z"
+      }
+    ]
+  },
+  {
+    "id": "29fdca9d-46ae-400a-8ec0-55696dcd9175",
+    "title": "AA超能膠 EXTRA",
+    "des": "升級版超能膠，強化黏結配方，粘性更強、固化更快，耐候性與穩定性更佳。可粘接多類硬軟材質，適用精細修補、工藝製作及日常加固粘接。\r\nUpgraded super glue with enhanced bonding formula, stronger viscosity and faster curing. It has better weather resistance and stability, bonds various hard and soft materials for fine repair, craft and daily reinforcement.",
+    "unit": [
+      "支"
+    ],
+    "price": "18",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780295152861-xesws7g6w7-image.jpg",
+    "categoryId": "18b860bb-3006-4301-84b7-ce863c117173",
+    "materialIds": [
+      "83fac669-ffdd-450c-bcea-7a168cb82f0c"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:25:52.955Z",
+    "updatedAt": "2026-08-10T08:23:13.077Z",
+    "category": {
+      "id": "18b860bb-3006-4301-84b7-ce863c117173",
+      "category": "膠水與接著劑",
+      "createdAt": "2026-01-19T05:18:18.648Z",
+      "updatedAt": "2026-01-19T05:18:18.648Z"
+    },
+    "materials": [
+      {
+        "id": "83fac669-ffdd-450c-bcea-7a168cb82f0c",
+        "materials": "膠",
+        "createdAt": "2026-01-19T05:17:22.152Z",
+        "updatedAt": "2026-01-19T05:17:22.152Z"
+      }
+    ]
+  },
+  {
+    "id": "96408653-abdd-4626-b4a4-561d85cde9c7",
+    "title": "花酒喉 Shower Hose",
+    "des": "1.5-1.75-2.0米\r\n\r\n高彈性浴室花灑軟管，柔軟可隨意彎折、不易纏繞斷裂。防水防鏽、耐高壓不滲水，接頭緊密牢固，适配各類花灑頭，耐用性強。\r\nHigh-elastic bathroom shower hose, flexible and tangle-free, not easy to break. It is waterproof, rust-proof, high-pressure resistant and leak-free with tight connectors, compatible with all kinds of shower heads and long-lasting.",
+    "unit": [
+      "條"
+    ],
+    "price": "69",
+    "img": "http://testoss-img-pan.oss-cn-hongkong.aliyuncs.com/products/1780294958621-089nkc3yy9zo-image.jpg",
+    "categoryId": "fed21e0c-bda8-495b-964b-89f21a1f79eb",
+    "materialIds": [
+      "ac91f3b6-e769-426a-9348-d1aa41b5d512"
+    ],
+    "arrivalDate": null,
+    "createdAt": "2026-06-01T06:22:38.705Z",
+    "updatedAt": "2026-08-10T08:24:05.495Z",
+    "category": {
+      "id": "fed21e0c-bda8-495b-964b-89f21a1f79eb",
+      "category": "水喉類",
+      "createdAt": "2026-02-04T10:37:10.689Z",
+      "updatedAt": "2026-02-04T10:37:10.689Z"
+    },
+    "materials": [
+      {
+        "id": "ac91f3b6-e769-426a-9348-d1aa41b5d512",
+        "materials": "塑料",
+        "createdAt": "2026-02-04T10:38:40.336Z",
+        "updatedAt": "2026-02-04T10:38:40.336Z"
+      }
+    ]
+  }
+]

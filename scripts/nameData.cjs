@@ -1,0 +1,130 @@
+// // scripts/nameData.cjs
+// const fs = require('fs');
+// const path = require('path');
+
+// // 500個英文名字（男女混合）
+// const ENGLISH_FIRST_NAMES = [
+//   // 男性名字
+//   'James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas', 'Charles',
+//   'Christopher', 'Daniel', 'Matthew', 'Anthony', 'Mark', 'Donald', 'Steven', 'Paul', 'Andrew', 'Joshua',
+//   'Kenneth', 'Kevin', 'Brian', 'George', 'Timothy', 'Ronald', 'Edward', 'Jason', 'Jeffrey', 'Ryan',
+//   'Jacob', 'Gary', 'Nicholas', 'Eric', 'Jonathan', 'Stephen', 'Larry', 'Justin', 'Scott', 'Brandon',
+//   'Benjamin', 'Samuel', 'Raymond', 'Gregory', 'Frank', 'Alexander', 'Patrick', 'Jack', 'Dennis', 'Jerry',
+//   'Tyler', 'Aaron', 'Jose', 'Nathan', 'Adam', 'Henry', 'Zachary', 'Todd', 'Chris', 'Kevin',
+//   'Daniel', 'Michael', 'David', 'James', 'Robert', 'John', 'Joseph', 'Thomas', 'Christopher', 'Matthew',
+//   'Anthony', 'Mark', 'Donald', 'Steven', 'Paul', 'Andrew', 'Joshua', 'Kenneth', 'Kevin', 'Brian',
+//   'George', 'Timothy', 'Ronald', 'Edward', 'Jason', 'Jeffrey', 'Ryan', 'Jacob', 'Gary', 'Nicholas',
+//   'Eric', 'Jonathan', 'Stephen', 'Larry', 'Justin', 'Scott', 'Brandon', 'Benjamin', 'Samuel', 'Raymond',
+//   'Gregory', 'Frank', 'Alexander', 'Patrick', 'Jack', 'Dennis', 'Jerry', 'Tyler', 'Aaron', 'Jose',
+//   'Nathan', 'Adam', 'Henry', 'Zachary', 'Todd', 'Chris', 'Dylan', 'Cameron', 'Austin', 'Hunter',
+//   'Christian', 'Ethan', 'Logan', 'Noah', 'Liam', 'Mason', 'Oliver', 'Elijah', 'Lucas', 'Aiden',
+//   'Carter', 'Grayson', 'Wyatt', 'Leo', 'Julian', 'Hudson', 'Ezra', 'Gabriel', 'Anthony', 'Dylan',
+//   'Christopher', 'Joshua', 'Andrew', 'Matthew', 'Daniel', 'David', 'James', 'Robert', 'John', 'Joseph',
+//   'Thomas', 'Charles', 'Christopher', 'Daniel', 'Matthew', 'Anthony', 'Mark', 'Donald', 'Steven', 'Paul',
+//   'Andrew', 'Joshua', 'Kenneth', 'Kevin', 'Brian', 'George', 'Timothy', 'Ronald', 'Edward', 'Jason',
+//   'Jeffrey', 'Ryan', 'Jacob', 'Gary', 'Nicholas', 'Eric', 'Jonathan', 'Stephen', 'Larry', 'Justin',
+//   'Scott', 'Brandon', 'Benjamin', 'Samuel', 'Raymond', 'Gregory', 'Frank', 'Alexander', 'Patrick', 'Jack',
+//   'Dennis', 'Jerry', 'Tyler', 'Aaron', 'Jose', 'Nathan', 'Adam', 'Henry', 'Zachary', 'Todd',
+  
+//   // 女性名字
+//   'Mary', 'Patricia', 'Jennifer', 'Linda', 'Barbara', 'Elizabeth', 'Susan', 'Jessica', 'Sarah', 'Karen',
+//   'Lisa', 'Nancy', 'Betty', 'Margaret', 'Sandra', 'Ashley', 'Kimberly', 'Donna', 'Emily', 'Carol',
+//   'Amanda', 'Melissa', 'Deborah', 'Stephanie', 'Rebecca', 'Sharon', 'Laura', 'Cynthia', 'Kathleen', 'Amy',
+//   'Angela', 'Shirley', 'Anna', 'Brenda', 'Pamela', 'Emma', 'Nicole', 'Helen', 'Samantha', 'Katherine',
+//   'Christine', 'Debra', 'Rachel', 'Carolyn', 'Janet', 'Catherine', 'Maria', 'Heather', 'Diane', 'Ruth',
+//   'Julie', 'Olivia', 'Joyce', 'Virginia', 'Victoria', 'Kelly', 'Lauren', 'Christina', 'Joan', 'Evelyn',
+//   'Judith', 'Megan', 'Cheryl', 'Andrea', 'Hannah', 'Martha', 'Jacqueline', 'Frances', 'Gloria', 'Ann',
+//   'Teresa', 'Kathryn', 'Sara', 'Janice', 'Jean', 'Alice', 'Madison', 'Doris', 'Abigail', 'Julia',
+//   'Judy', 'Grace', 'Denise', 'Amber', 'Marilyn', 'Beverly', 'Danielle', 'Theresa', 'Sophia', 'Marie',
+//   'Diana', 'Brittany', 'Natalie', 'Isabella', 'Charlotte', 'Rose', 'Alexis', 'Kayla', 'Ella', 'Avery',
+//   'Mia', 'Sophie', 'Zoe', 'Chloe', 'Lily', 'Emily', 'Emma', 'Olivia', 'Ava', 'Isabella',
+//   'Sophia', 'Mia', 'Charlotte', 'Amelia', 'Harper', 'Evelyn', 'Abigail', 'Emily', 'Elizabeth', 'Mila',
+//   'Ella', 'Avery', 'Sofia', 'Camila', 'Aria', 'Scarlett', 'Victoria', 'Madison', 'Luna', 'Grace',
+//   'Chloe', 'Penelope', 'Layla', 'Riley', 'Zoey', 'Nora', 'Lily', 'Eleanor', 'Hannah', 'Lillian',
+//   'Addison', 'Aubrey', 'Ellie', 'Stella', 'Natalie', 'Zoe', 'Leah', 'Hazel', 'Violet', 'Aurora',
+//   'Savannah', 'Audrey', 'Brooklyn', 'Bella', 'Claire', 'Skylar', 'Lucy', 'Paisley', 'Everly', 'Anna',
+//   'Caroline', 'Nova', 'Genesis', 'Emilia', 'Kennedy', 'Samantha', 'Maya', 'Willow', 'Kinsley', 'Naomi',
+//   'Aaliyah', 'Elena', 'Sarah', 'Ariana', 'Allison', 'Gabriella', 'Alice', 'Madelyn', 'Cora', 'Ruby',
+//   'Eva', 'Serenity', 'Autumn', 'Adeline', 'Hailey', 'Gianna', 'Valentina', 'Isla', 'Eliana', 'Quinn',
+//   'Nevaeh', 'Ivy', 'Sadie', 'Piper', 'Lydia', 'Alexa', 'Josephine', 'Emery', 'Julia', 'Delilah'
+// ];
+
+// // 500個英文姓氏
+// const ENGLISH_LAST_NAMES = [
+//   'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez',
+//   'Hernandez', 'Lopez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin', 'Lee',
+//   'Perez', 'Thompson', 'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson', 'Walker',
+//   'Young', 'Allen', 'King', 'Wright', 'Scott', 'Torres', 'Nguyen', 'Hill', 'Flores', 'Green',
+//   'Adams', 'Nelson', 'Baker', 'Hall', 'Rivera', 'Campbell', 'Mitchell', 'Carter', 'Roberts', 'Turner',
+//   'Phillips', 'Evans', 'Collins', 'Edwards', 'Stewart', 'Morris', 'Murphy', 'Cook', 'Rogers', 'Morgan',
+//   'Peterson', 'Cooper', 'Reed', 'Bailey', 'Bell', 'Howard', 'Ward', 'Cox', 'Diaz', 'Richardson',
+//   'Wood', 'Watson', 'Brooks', 'Bennett', 'Gray', 'James', 'Reyes', 'Cruz', 'Hughes', 'Price',
+//   'Myers', 'Long', 'Foster', 'Sanders', 'Ross', 'Powell', 'Sullivan', 'Russell', 'Ortiz', 'Jenkins',
+//   'Perry', 'Butler', 'Barnes', 'Fisher', 'Henderson', 'Coleman', 'Simmons', 'Patterson', 'Jordan', 'Reynolds',
+//   'Hamilton', 'Graham', 'Kim', 'Gonzalez', 'Alexander', 'Ramos', 'Wallace', 'Griffin', 'West', 'Cole',
+//   'Hayes', 'Chavez', 'Gibson', 'Bryant', 'Ellis', 'Stevens', 'Murray', 'Ford', 'Marshall', 'Owens',
+//   'McDonald', 'Harrison', 'Ruiz', 'Kennedy', 'Wells', 'Alvarez', 'Woods', 'Mendoza', 'Castillo', 'Olson',
+//   'Webb', 'Washington', 'Tucker', 'Freeman', 'Burns', 'Henry', 'Vasquez', 'Snyder', 'Simpson', 'Crawford',
+//   'Jimenez', 'Porter', 'Mason', 'Shaw', 'Gordon', 'Wagner', 'Hunter', 'Romero', 'Hicks', 'Dixon',
+//   'Hunt', 'Palmer', 'Robertson', 'Black', 'Holmes', 'Stone', 'Meyer', 'Boyd', 'Mills', 'Warren',
+//   'Fox', 'Rose', 'Rice', 'Moreno', 'Schmidt', 'Patel', 'Ferguson', 'Nichols', 'Herrera', 'Medina',
+//   'Ryan', 'Fernandez', 'Weaver', 'Daniels', 'Stephens', 'Gardner', 'Payne', 'Kelley', 'Dunn', 'Pierce',
+//   'Arnold', 'Tran', 'Spencer', 'Peters', 'Hawkins', 'Grant', 'Hansen', 'Castro', 'Hoffman', 'Hart',
+//   'Elliott', 'Cunningham', 'Knight', 'Bradley', 'Carroll', 'Hudson', 'Duncan', 'Armstrong', 'Berry', 'Andrews',
+//   'Johnston', 'Ray', 'Lane', 'Riley', 'Carpenter', 'Perkins', 'Aguilar', 'Silva', 'Richards', 'Willis',
+//   'Matthews', 'Chapman', 'Lawrence', 'Garza', 'Vargas', 'Watkins', 'Wheeler', 'Larson', 'Carlson', 'Harper',
+//   'George', 'Greene', 'Burke', 'Guzman', 'Morrison', 'Munoz', 'Jacobs', 'Obrien', 'Lawson', 'Franklin',
+//   'Lynch', 'Bishop', 'Carr', 'Salazar', 'Austin', 'Mendez', 'Gilbert', 'Jensen', 'Williamson', 'Montgomery',
+//   'Harvey', 'Oliver', 'Howell', 'Dean', 'Hanson', 'Weber', 'Garrett', 'Sims', 'Burton', 'Fuller',
+//   'Soto', 'McCoy', 'Welch', 'Chen', 'Schultz', 'Walters', 'Reid', 'Fields', 'Walsh', 'Little',
+//   'Fowler', 'Bowman', 'Davidson', 'May', 'Day', 'Schneider', 'Newman', 'Brewer', 'Lucas', 'Holland',
+//   'Wong', 'Banks', 'Santos', 'Curtis', 'Pearson', 'Delgado', 'Valdez', 'Pena', 'Rios', 'Douglas',
+//   'Sandoval', 'Barrett', 'Hopkins', 'Keller', 'Guerrero', 'Stanley', 'Bates', 'Alvarado', 'Beck', 'Ortega',
+//   'Wade', 'Estrada', 'Contreras', 'Barnett', 'Caldwell', 'Santiago', 'Lambert', 'Powers', 'Chambers', 'Nunez',
+//   'Craig', 'Leonard', 'Lowe', 'Rhodes', 'Byrd', 'Gregory', 'Shelton', 'Frazier', 'Becker', 'Maldonado',
+//   'Fleming', 'Vega', 'Sutton', 'Cohen', 'Jennings', 'Parks', 'McDaniel', 'Watts', 'Barker', 'Norris',
+//   'Vaughn', 'Vazquez', 'Holt', 'Schwartz', 'Steele', 'Benson', 'Neal', 'Dominguez', 'Horton', 'Terry',
+//   'Wolfe', 'Hale', 'Lyons', 'Graves', 'Haynes', 'Miles', 'Park', 'Warner', 'Padilla', 'Bush',
+//   'Thornton', 'McCarthy', 'Mann', 'Zimmerman', 'Erickson', 'Fletcher', 'McKinney', 'Page', 'Dawson', 'Joseph',
+//   'Marsh', 'Oconnor', 'Briggs', 'Tyler', 'Cortez', 'Collier', 'French', 'Klein', 'Cannon', 'Goodwin',
+//   'Baldwin', 'Blevins', 'Booker', 'Brandt', 'Bright', 'Britt', 'Brock', 'Bruce', 'Buchanan', 'Buckley',
+//   'Bullock', 'Burgess', 'Burris', 'Butterfield', 'Byers', 'Cabrera', 'Cain', 'Calderon', 'Callahan', 'Campos',
+//   'Carlton', 'Carney', 'Carson', 'Case', 'Cash', 'Castaneda', 'Cates', 'Chandler', 'Chaney', 'Chang',
+//   'Chapman', 'Chase', 'Chen', 'Cherry', 'Choi', 'Christian', 'Chung', 'Clarke', 'Clay', 'Clayton',
+//   'Clements', 'Cline', 'Cochran', 'Coffey', 'Cohen', 'Coker', 'Cole', 'Coleman', 'Collier', 'Collins',
+//   'Combs', 'Compton', 'Conley', 'Conner', 'Conrad', 'Contreras', 'Conway', 'Cook', 'Cooke', 'Coombs',
+//   'Cooper', 'Corbin', 'Cordova', 'Correa', 'Cortez', 'Costa', 'Cotton', 'Cox', 'Craig', 'Crane'
+// ];
+
+// // 保存名字數據
+// function saveNameData() {
+//   const dataDir = path.join(process.cwd(), 'scripts', 'data');
+//   if (!fs.existsSync(dataDir)) {
+//     fs.mkdirSync(dataDir, { recursive: true });
+//   }
+
+//   const nameData = {
+//     firstNames: ENGLISH_FIRST_NAMES,
+//     lastNames: ENGLISH_LAST_NAMES,
+//     totalFirstNames: ENGLISH_FIRST_NAMES.length,
+//     totalLastNames: ENGLISH_LAST_NAMES.length
+//   };
+
+//   fs.writeFileSync(
+//     path.join(dataDir, 'english_names.json'),
+//     JSON.stringify(nameData, null, 2)
+//   );
+
+//   console.log(`✅ 已生成 ${ENGLISH_FIRST_NAMES.length} 個英文名字`);
+//   console.log(`✅ 已生成 ${ENGLISH_LAST_NAMES.length} 個英文姓氏`);
+//   console.log(`📁 儲存位置: ${dataDir}/english_names.json`);
+//   console.log('\n📝 範例名稱:');
+//   for (let i = 0; i < 10; i++) {
+//     const firstName = ENGLISH_FIRST_NAMES[i];
+//     const lastName = ENGLISH_LAST_NAMES[i];
+//     console.log(`   ${firstName} ${lastName}`);
+//   }
+// }
+
+// // 執行
+// saveNameData();

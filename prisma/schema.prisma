@@ -25,10 +25,12 @@ model User {
   role         UserRole
   currentMembershipLevel MembershipLevel @default(FREE)
 
+  totalSpent Int @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 returnRequests ReturnRequest[]
-memberships UserMembership[]
+membership  UserMembership?
   Order           Order[]
   Cart            Cart[]
  wishlist        Product[] @relation("UserWishlist")  // 新增：用戶的願望清單商品
@@ -239,26 +241,44 @@ model MembershipTier {
   benefits    String[]
   color       String?
 
+  // 會員效期（月）
+  durationMonths Int @default(12)
+
+  // 會員折扣百分比（0=無折扣，10=9折，15=85折）
+  discountPercent Int @default(0)
+
+  // 自動升級門檻（累計消費金額，單位：分；null=不可自動升級）
+  minSpendForUpgrade Int?
+
+  // 是否允許自動升級到此等級
+  autoUpgrade Boolean @default(false)
+
+  userMemberships UserMembership[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  // 移除 memberships 關聯
 }
+
+
 model UserMembership {
-  id            String    @id @default(uuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
-  tierLevel     MembershipLevel  // 直接用 enum，不再關聯到 MembershipTier
-  startsAt      DateTime
-  endsAt        DateTime?
-  autoRenew     Boolean   @default(true)
-  status        String    @default("active")
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  tierLevel MembershipLevel
 
-  // 移除 tierId 和 tier 關聯
+  // 新增：關連到 MembershipTier
+  tier      MembershipTier @relation(fields: [tierLevel], references: [level])
+
+  startsAt  DateTime
+  endsAt    DateTime?
+  autoRenew Boolean   @default(true)
+  status    String    @default("active")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
   @@unique([userId])
+  @@index([tierLevel])
 }
 model RenewalRequest {
   id        String          @id @default(uuid())

@@ -123,6 +123,30 @@ export async function GET(request: NextRequest) {
       };
     });
 
+// 獲取會員等級對應的折扣資訊（新增）
+let memberDiscount = {
+  level: userMembershipLevel as string,
+  tierName: null as string | null,
+  percent: 0,
+  amount: 0,
+};
+
+if (userMembershipLevel !== MembershipLevel.FREE) {
+  const tier = await db.membershipTier.findUnique({
+    where: { level: userMembershipLevel },
+  });
+
+  if (tier && tier.discountPercent > 0) {
+    const discountAmountForTier = Math.floor(subtotal * tier.discountPercent / 100);
+    memberDiscount = {
+      level: userMembershipLevel as string,
+      tierName: tier.name,
+      percent: tier.discountPercent,
+      amount: discountAmountForTier,
+    };
+  }
+}
+
     // 計算總折扣金額
     const totalDiscountAmount = discountInfo
       .filter(d => d.applied)
@@ -145,6 +169,7 @@ export async function GET(request: NextRequest) {
         level: userMembershipLevel,
         info: userMembershipInfo,
       },
+      memberDiscount, // ← 新增
     });
   } catch (error) {
     console.error('API - 獲取折扣資訊失敗:', error);

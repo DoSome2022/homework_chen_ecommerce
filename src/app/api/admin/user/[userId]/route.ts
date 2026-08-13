@@ -1,22 +1,19 @@
 // src/app/api/admin/user/[userId]/route.ts
-import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { auth } from '../../../../../../auth';
+import { NextResponse } from 'next/server';
+import { auth } from '../../../../../../auth'; // 請調整正確路徑
 
 export async function GET(
-  req: Request, 
-  { params }: { params: Promise<{ userId: string }> } // params 是 Promise
+  req: Request,
+  { params }: { params: { userId: string } }
 ) {
-  // 解開 Promise 獲取 userId
-  const { userId } = await params;
-  
   const session = await auth();
   if (!session?.user || session.user.role !== 'ADMIN') {
     return NextResponse.json({ error: '未授權' }, { status: 401 });
   }
 
   const user = await db.user.findUnique({
-    where: { id: userId }, // 使用解開後的 userId
+    where: { id: params.userId },
     select: {
       id: true,
       username: true,
@@ -24,8 +21,26 @@ export async function GET(
       email: true,
       phone: true,
       role: true,
+      currentMembershipLevel: true,
       createdAt: true,
       updatedAt: true,
+      membership: {
+        select: {
+          tierLevel: true,
+          status: true,
+          startsAt: true,
+          endsAt: true,
+          autoRenew: true,
+          tier: {
+            select: {
+              name: true,
+              color: true,
+              benefits: true,
+              price: true,
+            },
+          },
+        },
+      },
       Order: {
         select: {
           id: true,
@@ -36,7 +51,6 @@ export async function GET(
           shippingMethod: true,
           shippingAddress: true,
         },
-        orderBy: { createdAt: 'desc' },
       },
     },
   });

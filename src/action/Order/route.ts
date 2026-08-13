@@ -407,7 +407,9 @@ export async function createStripeCheckoutSession(orderId: string) {
     // ✅ 簡單！直接使用 order.total（已包含運費）
     const stripeSession = await stripe.checkout.sessions.create({
       customer_email: session.user.email || undefined,
-      payment_method_types: ['card'],
+      payment_method_types: ['card',
+        'alipay'
+      ],
       mode: 'payment',
       
       // 成功和取消URL
@@ -476,8 +478,8 @@ export async function createStripeCheckoutSession(orderId: string) {
   } catch (error) {
     console.error('[createStripeCheckoutSession] 建立失敗:', error);
     return { 
-      success: false, 
-      error: '支付系統錯誤' 
+    success: false,
+    error:  '支付系統錯誤',
     };
   }
 }

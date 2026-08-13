@@ -1078,6 +1078,7 @@ import {
   Clock,
   Landmark,
   CreditCard,
+  Crown
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -1125,6 +1126,16 @@ type DiscountInfo = {
   description: string;
 };
 
+type MembershipLevel = 'FREE' | 'SILVER' | 'GOLD' | 'PLATINUM';
+
+type MemberDiscount = {
+  level: MembershipLevel;
+  tierName: string | null;
+  percent: number;
+  amount: number;
+};
+
+
 type DiscountResponse = {
   subtotal: number;
   shippingFee: number;
@@ -1133,6 +1144,7 @@ type DiscountResponse = {
   appliedDiscounts: DiscountInfo[];
   availableDiscounts: DiscountInfo[];
   unavailableDiscounts: DiscountInfo[];
+  memberDiscount?: MemberDiscount; // ← 新增
 };
 
 const fetcher = (url: string) =>
@@ -1154,6 +1166,8 @@ export default function CheckoutForm() {
   const [cartSubtotal, setCartSubtotal] = useState<number>(0);
   const [cartItemsCount, setCartItemsCount] = useState<number>(0);
   
+
+
   const userId = session?.user?.id;
 
   // 從購物車取得實際金額
@@ -1338,8 +1352,14 @@ export default function CheckoutForm() {
     : 0;
 
   // ✅ 簡化：只計算一般折扣 + 限時折扣，沒有會員折扣
-  const totalDiscountAmount = discountAmount + ninetyPercentDiscountAmount;
-  const finalPayableAmount = (subtotal + shippingFee) - totalDiscountAmount;
+  // const totalDiscountAmount = discountAmount + ninetyPercentDiscountAmount;
+  // const finalPayableAmount = (subtotal + shippingFee) - totalDiscountAmount;
+
+  const memberDiscount = discountData?.memberDiscount;
+const memberDiscountAmount = memberDiscount?.amount ?? 0;
+
+  const totalDiscountAmount = discountAmount + ninetyPercentDiscountAmount + memberDiscountAmount;
+const finalPayableAmount = Math.max(0, (subtotal + shippingFee) - totalDiscountAmount);
 
   return (
     <Card className="max-w-2xl mx-auto">
@@ -1365,6 +1385,24 @@ export default function CheckoutForm() {
             </Badge>
           </div>
         </div>
+
+
+{memberDiscountAmount > 0 && memberDiscount && (
+  <div className="p-3 border-2 border-purple-300 bg-purple-50 rounded-md mb-3 flex items-center justify-between">
+    <div className="flex items-center gap-2">
+      <Crown className="h-5 w-5 text-purple-600" />
+      <div>
+        <div className="font-medium text-purple-800">
+          {memberDiscount.tierName}專屬{memberDiscount.percent * 10}折
+        </div>
+        <div className="text-xs text-purple-600">已自動套用</div>
+      </div>
+    </div>
+    <div className="text-purple-700 font-bold">
+      -${memberDiscountAmount.toLocaleString()}
+    </div>
+  </div>
+)}
 
         {/* 折扣與總額明細區塊 */}
         <div className="border rounded-lg p-6 bg-muted/30">
@@ -1603,6 +1641,17 @@ export default function CheckoutForm() {
               <span>運費</span>
               <span>${shippingFee.toLocaleString()}</span>
             </div>
+            {memberDiscountAmount > 0 && memberDiscount && (
+              <div className="border-l-4 border-purple-500 pl-3 py-2 bg-purple-50 rounded-r">
+                <div className="flex justify-between text-sm text-purple-700 font-bold">
+                  <span className="flex items-center gap-1">
+                    <Crown className="h-4 w-4" />
+                    {memberDiscount.tierName}專屬折扣（{memberDiscount.percent * 10}折）
+                  </span>
+                  <span>-${memberDiscountAmount.toLocaleString()}</span>
+                </div>
+              </div>
+            )}
 
             {hasNinetyPercentDiscount && (
               <div className="border-l-4 border-red-500 pl-3 py-2 bg-red-50 rounded-r">
