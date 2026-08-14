@@ -113,6 +113,13 @@ export default function Navbar() {
               續訂
             </Link>
 
+            <Link
+              href="/admin/membershiptiers"
+              className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              會員等級管理
+            </Link>
+
             {/* 登出按鈕 */}
             <Button
               onClick={handleLogout}

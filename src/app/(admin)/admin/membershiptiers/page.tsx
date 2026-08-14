@@ -307,7 +307,7 @@ type TierFormData = z.infer<typeof tierSchema>;
 const tierFormResolver = zodResolver(tierSchema) as Resolver<TierFormData>;
 
 export default function MembershipTiersPage() {
-  const { data: tiers = [], isLoading } = useSWR<MembershipTier[]>('/api/admin/membership-tiers', fetcher);
+  const { data: tiers = [], isLoading } = useSWR<MembershipTier[]>('/api/admin/membershiptiers', fetcher);
   const { mutate } = useSWRConfig();
 
   const [open, setOpen] = useState(false);
@@ -416,10 +416,10 @@ const form = useForm<TierFormData>({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              <p>價格：NT${tier.price.toLocaleString()}</p>
+              <p>價格：${tier.price.toLocaleString()}</p>
               <p>效期：{tier.durationMonths} 個月</p>
               <p>折扣：{tier.discountPercent > 0 ? `${tier.discountPercent * 10}折` : '無折扣'}</p>
-              <p>自動升級門檻：{tier.minSpendForUpgrade ? `累計消費 NT$${(tier.minSpendForUpgrade / 100).toLocaleString()}` : '無'}</p>
+              <p>自動升級門檻：{tier.minSpendForUpgrade ? `累計消費 $${(tier.minSpendForUpgrade / 100).toLocaleString()}` : '無'}</p>
               <p>自動升級：{tier.autoUpgrade ? '✅ 是' : '❌ 否'}</p>
               <p>權益：{tier.benefits.join('、')}</p>
 
