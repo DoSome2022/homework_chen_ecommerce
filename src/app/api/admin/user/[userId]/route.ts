@@ -1,19 +1,22 @@
 // src/app/api/admin/user/[userId]/route.ts
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
-import { auth } from '../../../../../../auth'; // 請調整正確路徑
+import { auth } from '../../../../../../auth';
 
 export async function GET(
   req: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   const session = await auth();
   if (!session?.user || session.user.role !== 'ADMIN') {
     return NextResponse.json({ error: '未授權' }, { status: 401 });
   }
 
+  // ✅ 關鍵：await params
+  const { userId } = await params;
+
   const user = await db.user.findUnique({
-    where: { id: params.userId },
+    where: { id: userId },
     select: {
       id: true,
       username: true,

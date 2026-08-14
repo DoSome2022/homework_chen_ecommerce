@@ -5,15 +5,18 @@ import { auth } from '../../../../../../auth'; // 依實際路徑調整
 
 export async function GET(
   req: Request,
-  { params }: { params: { orderId: string } }
+  { params }: { params: Promise<{ orderId: string }> } // ✅ 改這裡
 ) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: '未授權' }, { status: 401 });
   }
 
+  // ✅ 新增：await params
+  const { orderId } = await params;
+
   const order = await db.order.findUnique({
-    where: { id: params.orderId },
+    where: { id: orderId }, // ✅ 改用解構後的變數
     select: {
       id: true,
       userId: true,
@@ -41,7 +44,7 @@ export async function GET(
     success: true,
     order: {
       ...order,
-      productAmount: order.total - order.shippingFee, // 商品金額 = 總額 - 運費
+      productAmount: order.total - order.shippingFee,
     },
   });
 }
